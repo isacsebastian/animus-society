@@ -1,0 +1,149 @@
+---
+import PricingGym from "./PricingGym.astro";
+import PricingApp from "./PricingApp.astro";
+---
+
+<!-- Modal -->
+<div
+  id="static-modal"
+  aria-hidden="true"
+  class="hidden fixed inset-0 z-50 justify-center items-center p-4"
+>
+  <!-- Backdrop -->
+  <div class="fixed inset-0 bg-black/50 -z-10"></div>
+
+  <!-- Contenedor del modal -->
+  <div
+    class="relative w-full max-w-6xl max-h-[90vh] rounded-2xl shadow-xl bg-gray-800 overflow-y-auto"
+  >
+    <!-- Header (tabs) -->
+    <div
+      class="bg-gray-900 flex items-center justify-center p-4 border-b border-gray-700 relative"
+    >
+      <!-- Tabs -->
+      <ul
+        id="tabs-header"
+        class="text-sm font-medium text-center rounded-lg shadow-sm flex divide-gray-700 text-gray-400"
+      >
+        <li class="w-full focus-within:z-10">
+          <button
+            data-tab="gym"
+            class="tab-btn inline-block w-full py-2 px-6 border-r border-gray-700 rounded-s-lg bg-gray-700 text-white active"
+          >
+            Gimnasio
+          </button>
+        </li>
+
+        <li class="w-full focus-within:z-10">
+          <button
+            data-tab="app"
+            class="tab-btn inline-block w-full py-2 px-6 border-s-0 border-gray-700 rounded-e-lg hover:text-white bg-gray-800 hover:bg-gray-700"
+          >
+            App
+          </button>
+        </li>
+      </ul>
+
+      <button
+        type="button"
+        class="text-gray-400 rounded-lg w-8 h-8 flex items-center justify-center hover:bg-gray-600 absolute top-3 right-3"
+        data-modal-hide="static-modal"
+      >
+        ✕
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div id="tab-content">
+      <!-- Tab Gimnasio -->
+      <div data-tab-content="gym" class="tab-panel">
+        <PricingGym />
+      </div>
+
+      <!-- Tab App -->
+      <div data-tab-content="app" class="tab-panel hidden">
+        <PricingApp />
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Script -->
+<script is:inline>
+  document.addEventListener("DOMContentLoaded", () => {
+    const openButtons = document.querySelectorAll("[data-modal-target]");
+    const closeButtons = document.querySelectorAll("[data-modal-hide]");
+    const tabButtons = document.querySelectorAll(".tab-btn");
+    const tabPanels = document.querySelectorAll(".tab-panel");
+
+    // ---- MODAL ----
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      if (!modal) return;
+
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+
+      // backdrop
+      const backdrop = document.createElement("div");
+      backdrop.className = "fixed inset-0 z-40 modal-backdrop backdrop-blur-xs";
+      document.body.appendChild(backdrop);
+    }
+
+    function closeModal(id) {
+      const modal = document.getElementById(id);
+      if (!modal) return;
+
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+
+      const backdrop = document.querySelector(".modal-backdrop");
+      if (backdrop) backdrop.remove();
+    }
+
+    openButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const target = btn.getAttribute("data-modal-target");
+        openModal(target);
+      });
+    });
+
+    closeButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const target = btn.getAttribute("data-modal-hide");
+        closeModal(target);
+      });
+    });
+
+    // ---- TABS ----
+    tabButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const target = btn.getAttribute("data-tab");
+
+        // resetear todos los botones a inactivo
+        tabButtons.forEach((b) => {
+          b.classList.remove("active", "bg-gray-700", "text-white");
+          b.classList.add(
+            "bg-gray-800",
+            "text-gray-400",
+            "hover:text-white",
+            "hover:bg-gray-700"
+          );
+        });
+
+        // activar el botón actual
+        btn.classList.add("active", "bg-gray-700", "text-white");
+        btn.classList.remove("bg-gray-800", "text-gray-400");
+
+        // mostrar panel correcto
+        tabPanels.forEach((panel) => {
+          if (panel.getAttribute("data-tab-content") === target) {
+            panel.classList.remove("hidden");
+          } else {
+            panel.classList.add("hidden");
+          }
+        });
+      });
+    });
+  });
+</script>

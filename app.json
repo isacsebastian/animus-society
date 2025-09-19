@@ -1,0 +1,524 @@
+{
+  "name": "Content Factory – Telegram → OpenAI → Sheets → Email",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          {
+            "text": "¡Tu bot está activo! Envíame tu idea de contenido.\n\nEjemplos:\n- \"Para LinkedIn: KPIs legales para estudios\"\n- \"Todas: derechos del consumidor por devolución 15 días\"\n- \"YouTube: Guía de SGSI para pymes\"\n"
+          }
+        ]
+      },
+      "id": "WelcomeMsg",
+      "name": "Welcome (optional)",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [-60, -260]
+    },
+    {
+      "parameters": {
+        "updates": [
+          {
+            "text": " ",
+            "style": "h2"
+          }
+        ]
+      },
+      "id": "Spacer",
+      "name": "—",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [-60, -160]
+    },
+    {
+      "parameters": {},
+      "id": "TelegramTrigger",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [-60, 60],
+      "credentials": {
+        "telegramApi": {
+          "id": "_REPLACE_ME_",
+          "name": "Telegram Bot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const text = $json.message?.text || $json.text || \"\";\n// Permite inline hints: \"para linkedin\", \"all\", etc.\nconst lower = text.toLowerCase();\nlet origen = \"telegram\";\nreturn [{\n  origen,\n  texto_input: text.trim(),\n  user_id: $json.message?.from?.id || null,\n  chat_id: $json.message?.chat?.id || null,\n  hinted: {\n    youtube: /(\\byoutube\\b|\\byt\\b)/.test(lower),\n    tiktok: /(\\btiktok\\b|\\btt\\b)/.test(lower),\n    x: /(\\bx\\b|\\btwitter\\b|\\bhilo\\b|\\bthread\\b)/.test(lower),\n    linkedin: /(linkedin|linkdind|linkdin|profesional)/.test(lower),\n    web: /(\\bweb\\b|\\bblog\\b|seo|meta descripción|slug|h1)/.test(lower),\n    all: /(todas|all)/.test(lower)\n  }\n}];"
+      },
+      "id": "NormalizeInput",
+      "name": "Normalize Input (Function)",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [220, 60]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "chatInstruction": "Eres un clasificador. Dado un texto con una idea de contenido, devuelve un JSON con:\n- platforms: array con cualquiera de [\"youtube\",\"tiktok\",\"x\",\"linkedin\",\"web\"].\n- reason: breve explicación.\n- confidence: 0-1.\nSi el usuario dice \"todas\" o \"all\", incluye todas las plataformas. Responde SOLO el JSON.",
+        "options": {}
+      },
+      "id": "ClassifierLLM",
+      "name": "Classifier (OpenAI Chat)",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 5,
+      "position": [460, -60],
+      "credentials": {
+        "openAiApi": {
+          "id": "_REPLACE_ME_",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const hinted = $json.hinted || {};\nif (hinted.all) {\n  return [{ platforms: [\"youtube\",\"tiktok\",\"x\",\"linkedin\",\"web\"], reason: \"hint: all\", confidence: 0.99 }];\n}\n// Si hay hints claros, úsalos como override\nconst p = [];\nif (hinted.youtube) p.push(\"youtube\");\nif (hinted.tiktok) p.push(\"tiktok\");\nif (hinted.x) p.push(\"x\");\nif (hinted.linkedin) p.push(\"linkedin\");\nif (hinted.web) p.push(\"web\");\nif (p.length) return [{ platforms: p, reason: \"rules override\", confidence: 0.95 }];\n\n// Si no, intenta parsear la respuesta del LLM del nodo anterior\nlet llmRaw = $items(\"Classifier (OpenAI Chat)\", 0, 0).json?.response || \"\";\nif (typeof llmRaw !== 'string') llmRaw = JSON.stringify(llmRaw);\nlet platforms = [];\nlet reason = \"\";\nlet confidence = 0.7;\ntry {\n  const parsed = JSON.parse(llmRaw);\n  platforms = parsed.platforms || [];\n  reason = parsed.reason || \"\";\n  confidence = parsed.confidence ?? 0.7;\n} catch(e) {\n  // noop\n}\nif (!platforms.length) {\n  // Fallback: por defecto LinkedIn (o cámbialo a [\"youtube\",...])\n  platforms = [\"linkedin\"]; \n  reason = reason || \"fallback\";\n  confidence = 0.6;\n}\nreturn [{ platforms, reason, confidence }];"
+      },
+      "id": "ClassifierFallback",
+      "name": "Classifier Fallback (Function)",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [700, -60]
+    },
+    {
+      "parameters": {
+        "functionCode": "const { platforms } = $json;\nconst base = $items(0,0).json; // del Normalize Input\nreturn platforms.map(p => ({...base, currentPlatform: p, platforms }));"
+      },
+      "id": "ExpandPlatforms",
+      "name": "Expand Platforms (Function)",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [920, -60]
+    },
+    {
+      "parameters": {
+        "batchSize": 1
+      },
+      "id": "SplitBatches",
+      "name": "Split In Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [1140, -60]
+    },
+    {
+      "parameters": {
+        "propertyName": "currentPlatform",
+        "rules": {
+          "values": [
+            { "value": "youtube" },
+            { "value": "tiktok" },
+            { "value": "x" },
+            { "value": "linkedin" },
+            { "value": "web" }
+          ]
+        }
+      },
+      "id": "SwitchPlatform",
+      "name": "Switch (Platform)",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 2,
+      "position": [1360, -60]
+    },
+
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "chatInstruction": "Eres estratega YouTube. Devuelve JSON con: titulo (60-70c, con búsqueda), copy_principal (150-250 palabras con keywords), cta (1), extras.capitulos (t,label), extras.tags (8-12), extras.thumbnail_brief (3-5 palabras). Responde SOLO JSON.",
+        "options": {}
+      },
+      "id": "GenYouTube",
+      "name": "Gen YouTube (OpenAI)",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 5,
+      "position": [1600, -240],
+      "credentials": {
+        "openAiApi": {
+          "id": "_REPLACE_ME_",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const tema = $items(0,0).json.texto_input;\nconst prompt = Tema: \"${tema}\"\nObjetivo: educar y generar autoridad en derecho/LegalTech en Ecuador.\nAñade una línea final invitando a suscribirse.;\nreturn [{ user: prompt }];"
+      },
+      "id": "PrepPromptYT",
+      "name": "Prep Prompt YT (Function)",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [1600, -340]
+    },
+    {
+      "parameters": {
+        "functionCode": "let raw = $items(\"Gen YouTube (OpenAI)\", 0, 0).json?.response || \"{}\";\ntry { raw = JSON.parse(raw); } catch(e) {}\nreturn [raw];"
+      },
+      "id": "ParseYT",
+      "name": "Parse YT (JSON)",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [1780, -240]
+    },
+
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "chatInstruction": "Eres guionista de short-form video. Devuelve JSON con: titulo, copy_principal (1-2 líneas), cta, extras.guion ([HOOK],[VALOR 1],[VALOR 2],[CTA]), extras.hashtags (5-10). 30–45s, gancho en 3s, lenguaje cercano. SOLO JSON.",
+        "options": {}
+      },
+      "id": "GenTikTok",
+      "name": "Gen TikTok (OpenAI)",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 5,
+      "position": [1600, -60],
+      "credentials": {
+        "openAiApi": {
+          "id": "_REPLACE_ME_",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const tema = $items(0,0).json.texto_input;\nconst prompt = Tema: \"${tema}\"\nPúblico: Ecuador, derecho del consumidor y LegalTech.\nObjetivo: awareness y leads por DM.;\nreturn [{ user: prompt }];"
+      },
+      "id": "PrepPromptTT",
+      "name": "Prep Prompt TT (Function)",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [1600, -160]
+    },
+    {
+      "parameters": {
+        "functionCode": "let raw = $items(\"Gen TikTok (OpenAI)\", 0, 0).json?.response || \"{}\";\ntry { raw = JSON.parse(raw); } catch(e) {}\nreturn [raw];"
+      },
+      "id": "ParseTT",
+      "name": "Parse TT (JSON)",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [1780, -60]
+    },
+
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "chatInstruction": "Eres copywriter para X. Devuelve JSON con: titulo (opcional), copy_principal (3 variantes de 220-260 caracteres), cta (corto), extras.hashtags (3-6), extras.thread (3-5 tweets de 200-240c). Tono claro y con insight. SOLO JSON.",
+        "options": {}
+      },
+      "id": "GenX",
+      "name": "Gen X (OpenAI)",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 5,
+      "position": [1600, 120],
+      "credentials": {
+        "openAiApi": {
+          "id": "_REPLACE_ME_",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const tema = $items(0,0).json.texto_input;\nconst prompt = Tema: \"${tema}\"\nObjetivo: discusión y clics al perfil.;\nreturn [{ user: prompt }];"
+      },
+      "id": "PrepPromptX",
+      "name": "Prep Prompt X (Function)",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [1600, 20]
+    },
+    {
+      "parameters": {
+        "functionCode": "let raw = $items(\"Gen X (OpenAI)\", 0, 0).json?.response || \"{}\";\ntry { raw = JSON.parse(raw); } catch(e) {}\nreturn [raw];"
+      },
+      "id": "ParseX",
+      "name": "Parse X (JSON)",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [1780, 120]
+    },
+
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "chatInstruction": "Eres copywriter B2B experto en LinkedIn. Devuelve JSON con: titulo, copy_principal (120–220 palabras, gancho, tono profesional, máx 2 emojis), cta, extras.hashtags (5-8). SOLO JSON.",
+        "options": {}
+      },
+      "id": "GenLinkedIn",
+      "name": "Gen LinkedIn (OpenAI)",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 5,
+      "position": [1600, 300],
+      "credentials": {
+        "openAiApi": {
+          "id": "_REPLACE_ME_",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const tema = $items(0,0).json.texto_input;\nconst prompt = Tema: \"${tema}\"\nContexto: Soy abogado/LegalTech en Ecuador. Público: directivos, emprendedores y abogados. Objetivo: valor educativo + autoridad + invitación a conversar.;\nreturn [{ user: prompt }];"
+      },
+      "id": "PrepPromptIN",
+      "name": "Prep Prompt IN (Function)",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [1600, 200]
+    },
+    {
+      "parameters": {
+        "functionCode": "let raw = $items(\"Gen LinkedIn (OpenAI)\", 0, 0).json?.response || \"{}\";\ntry { raw = JSON.parse(raw); } catch(e) {}\nreturn [raw];"
+      },
+      "id": "ParseIN",
+      "name": "Parse IN (JSON)",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [1780, 300]
+    },
+
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "chatInstruction": "Eres editor SEO. Devuelve JSON con: titulo(H1<=65c), copy_principal(lead 60-90p), cta, extras.slug, extras.meta_description(140-160c), extras.outline(H2/H3), extras.faq({q,a} 3-5), extras.schema(JSON-LD FAQPage válido). SOLO JSON.",
+        "options": {}
+      },
+      "id": "GenWeb",
+      "name": "Gen Web/Blog (OpenAI)",
+      "type": "n8n-nodes-base.openAi",
+      "typeVersion": 5,
+      "position": [1600, 480],
+      "credentials": {
+        "openAiApi": {
+          "id": "_REPLACE_ME_",
+          "name": "OpenAI API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const tema = $items(0,0).json.texto_input;\nconst prompt = Tema: \"${tema}\"\nPúblico: empresarios y abogados en Ecuador. Evita jerga innecesaria.;\nreturn [{ user: prompt }];"
+      },
+      "id": "PrepPromptWEB",
+      "name": "Prep Prompt WEB (Function)",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [1600, 380]
+    },
+    {
+      "parameters": {
+        "functionCode": "let raw = $items(\"Gen Web/Blog (OpenAI)\", 0, 0).json?.response || \"{}\";\ntry { raw = JSON.parse(raw); } catch(e) {}\nreturn [raw];"
+      },
+      "id": "ParseWEB",
+      "name": "Parse WEB (JSON)",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [1780, 480]
+    },
+
+    {
+      "parameters": {
+        "functionCode": "const inData = $json;\nconst baseItem = $items(0,0).json; // trae origen, texto_input, currentPlatform\nconst out = {\n  timestamp: new Date().toISOString(),\n  origen: baseItem.origen || \"telegram\",\n  tema_raw: baseItem.texto_input || \"\",\n  plataforma: baseItem.currentPlatform,\n  titulo: inData.titulo || \"\",\n  copy_principal: inData.copy_principal || \"\",\n  cta: inData.cta || \"\",\n  extras: inData.extras || {}\n};\nreturn [out];"
+      },
+      "id": "Assemble",
+      "name": "Assemble Result (Function)",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [1980, 100]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "sheetId": "_REPLACE_SPREADSHEET_ID_",
+        "range": "Hoja1!A:Z",
+        "keyRow": 1,
+        "options": {
+          "valueInputMode": "RAW"
+        },
+        "data": "={{[{\"timestamp\": $json.timestamp, \"origen\": $json.origen, \"plataforma\": $json.plataforma, \"tema_raw\": $json.tema_raw, \"titulo\": $json.titulo, \"copy_principal\": $json.copy_principal, \"cta\": $json.cta, \"hashtags\": JSON.stringify($json.extras.hashtags || []), \"guion\": $json.extras.guion || \"\", \"descripcion\": $json.extras.descripcion || \"\", \"capitulos\": JSON.stringify($json.extras.capitulos || []), \"tags\": JSON.stringify($json.extras.tags || []), \"slug\": $json.extras.slug || \"\", \"meta_description\": $json.extras.meta_description || \"\"}]}]"
+      },
+      "id": "GoogleSheets",
+      "name": "Google Sheets (Append)",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 5,
+      "position": [2180, 100],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "_REPLACE_ME_",
+          "name": "Google Sheets"
+        }
+      }
+    },
+
+    {
+      "parameters": {
+        "mode": "wait"
+      },
+      "id": "MergeAll",
+      "name": "Merge (Wait All Platforms)",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [2400, 100]
+    },
+    {
+      "parameters": {
+        "functionCode": "const items = $items();\nfunction block(it){\n  const hs = (it.extras?.hashtags||[]).join(' ');\n  const ch = (it.extras?.capitulos||[]).map(c=>${c.t} – ${c.label}).join('<br>');\n  return \n  <h3>${it.plataforma.toUpperCase()} – ${it.titulo||''}</h3>\n  <p>${(it.copy_principal||'').replace(/\\n/g,'<br>')}</p>\n  ${it.cta?<p><b>CTA:</b> ${it.cta}</p>:''}\n  ${hs?<p><b>Hashtags:</b> ${hs}</p>:''}\n  ${ch?<p><b>Capítulos:</b><br>${ch}</p>:''}\n  `;\n}\nconst html = `\n<h2>Contenido generado</h2>\n<p><b>Tema:</b> ${items[0].json.tema_raw}</p>\n${items.map(i=>block(i.json)).join('\\n')}\n<hr>\n<p>Guardado en Google Sheets (hoja configurada en el workflow).</p>;\nreturn [{ html }];"
+      },
+      "id": "BuildEmailHTML",
+      "name": "Build Email HTML (Function)",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 2,
+      "position": [2600, 100]
+    },
+    {
+      "parameters": {
+        "fromEmail": "contenidos@tudominio.com",
+        "toEmail": "tu-correo@tudominio.com",
+        "subject": "Contenido listo – {{ $json.html.match(/<b>Tema:<\\/b> ([^<]+)/)?.[1] || 'Nuevo contenido' }}",
+        "html": "={{$json.html}}"
+      },
+      "id": "SendEmail",
+      "name": "Send Email (SMTP/Gmail)",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 3,
+      "position": [2800, 100],
+      "credentials": {
+        "smtp": {
+          "id": "_REPLACE_ME_",
+          "name": "SMTP / Gmail"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [[{ "node": "Normalize Input", "type": "main", "index": 0 }]]
+    },
+    "Normalize Input (Function)": {
+      "main": [
+        [{ "node": "Classifier (OpenAI Chat)", "type": "main", "index": 0 }]
+      ]
+    },
+    "Classifier (OpenAI Chat)": {
+      "main": [
+        [
+          {
+            "node": "Classifier Fallback (Function)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classifier Fallback (Function)": {
+      "main": [
+        [{ "node": "Expand Platforms (Function)", "type": "main", "index": 0 }]
+      ]
+    },
+    "Expand Platforms (Function)": {
+      "main": [[{ "node": "Split In Batches", "type": "main", "index": 0 }]]
+    },
+    "Split In Batches": {
+      "main": [[{ "node": "Switch (Platform)", "type": "main", "index": 0 }]]
+    },
+    "Switch (Platform)": {
+      "main": [
+        [{ "node": "Prep Prompt YT (Function)", "type": "main", "index": 0 }],
+        [{ "node": "Prep Prompt TT (Function)", "type": "main", "index": 0 }],
+        [{ "node": "Prep Prompt X (Function)", "type": "main", "index": 0 }],
+        [{ "node": "Prep Prompt IN (Function)", "type": "main", "index": 0 }],
+        [{ "node": "Prep Prompt WEB (Function)", "type": "main", "index": 0 }]
+      ]
+    },
+
+    "Prep Prompt YT (Function)": {
+      "main": [[{ "node": "Gen YouTube (OpenAI)", "type": "main", "index": 0 }]]
+    },
+    "Gen YouTube (OpenAI)": {
+      "main": [[{ "node": "Parse YT (JSON)", "type": "main", "index": 0 }]]
+    },
+
+    "Prep Prompt TT (Function)": {
+      "main": [[{ "node": "Gen TikTok (OpenAI)", "type": "main", "index": 0 }]]
+    },
+    "Gen TikTok (OpenAI)": {
+      "main": [[{ "node": "Parse TT (JSON)", "type": "main", "index": 0 }]]
+    },
+
+    "Prep Prompt X (Function)": {
+      "main": [[{ "node": "Gen X (OpenAI)", "type": "main", "index": 0 }]]
+    },
+    "Gen X (OpenAI)": {
+      "main": [[{ "node": "Parse X (JSON)", "type": "main", "index": 0 }]]
+    },
+
+    "Prep Prompt IN (Function)": {
+      "main": [
+        [{ "node": "Gen LinkedIn (OpenAI)", "type": "main", "index": 0 }]
+      ]
+    },
+    "Gen LinkedIn (OpenAI)": {
+      "main": [[{ "node": "Parse IN (JSON)", "type": "main", "index": 0 }]]
+    },
+
+    "Prep Prompt WEB (Function)": {
+      "main": [
+        [{ "node": "Gen Web/Blog (OpenAI)", "type": "main", "index": 0 }]
+      ]
+    },
+    "Gen Web/Blog (OpenAI)": {
+      "main": [[{ "node": "Parse WEB (JSON)", "type": "main", "index": 0 }]]
+    },
+
+    "Parse YT (JSON)": {
+      "main": [
+        [{ "node": "Assemble Result (Function)", "type": "main", "index": 0 }]
+      ]
+    },
+    "Parse TT (JSON)": {
+      "main": [
+        [{ "node": "Assemble Result (Function)", "type": "main", "index": 0 }]
+      ]
+    },
+    "Parse X (JSON)": {
+      "main": [
+        [{ "node": "Assemble Result (Function)", "type": "main", "index": 0 }]
+      ]
+    },
+    "Parse IN (JSON)": {
+      "main": [
+        [{ "node": "Assemble Result (Function)", "type": "main", "index": 0 }]
+      ]
+    },
+    "Parse WEB (JSON)": {
+      "main": [
+        [{ "node": "Assemble Result (Function)", "type": "main", "index": 0 }]
+      ]
+    },
+    "Assemble Result (Function)": {
+      "main": [
+        [
+          { "node": "Google Sheets (Append)", "type": "main", "index": 0 },
+          { "node": "Split In Batches", "type": "main", "index": 1 }
+        ]
+      ]
+    },
+    "Google Sheets (Append)": {
+      "main": [
+        [{ "node": "Merge (Wait All Platforms)", "type": "main", "index": 0 }]
+      ]
+    },
+
+    "Merge (Wait All Platforms)": {
+      "main": [
+        [{ "node": "Build Email HTML (Function)", "type": "main", "index": 0 }]
+      ]
+    },
+    "Build Email HTML (Function)": {
+      "main": [
+        [{ "node": "Send Email (SMTP/Gmail)", "type": "main", "index": 0 }]
+      ]
+    }
+  }
+}

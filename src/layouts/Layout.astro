@@ -1,0 +1,144 @@
+---
+import "../styles/global.css";
+import "@fontsource/poppins/400.css";
+import "@fontsource/poppins/500.css";
+import "@fontsource/poppins/900.css";
+import "@fontsource/poppins/400-italic.css";
+import "@fontsource/poppins/500-italic.css";
+import "@fontsource/poppins/900-italic.css";
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props as Props;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <link rel="shortcut icon" href="/icon.png" type="image/x-icon" />
+    <title>{title}</title>
+
+    <style is:global>
+      :root {
+        --bg-start: #31214c;
+        --bg-end: #291534;
+        --grid-color: 2, 2, 2;
+        --grid-opacity: 0.4;
+        --grid-size: 3px;
+      }
+
+      html,
+      body {
+        font-family: "Poppins", sans-serif;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      body {
+        background: radial-gradient(
+            1200px 600px at 85% 40%,
+            #9e23fb40,
+            transparent 60%
+          ),
+          linear-gradient(180deg, var(--bg-start), var(--bg-end));
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      .bg-image {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: url("/fondo_animuss.png") center/cover no-repeat;
+        z-index: 0;
+        opacity: 0.5;
+        mask-image: linear-gradient(
+          to bottom,
+          rgb(3, 9, 33) 80%,
+          transparent 90%
+        );
+      }
+
+      .fondo_grande {
+        display: none;
+      }
+
+      @media (min-width: 768px) {
+        .bg-image {
+          display: none;
+        }
+
+        .fondo_grande {
+          display: block;
+          position: fixed;
+          inset: 0;
+          z-index: -1;
+          opacity: 0.7;
+          background: linear-gradient(
+              to right,
+              rgba(59, 16, 83, 0.67),
+              rgba(173, 83, 137, 0.487)
+            ),
+            url("../assets/images/fondo_grande.jpg");
+          background-size: cover;
+          background-position: center;
+          background-repeat: no-repeat;
+          opacity: 0.7;
+        }
+      }
+
+      .grid-overlay {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background-image: linear-gradient(
+            to right,
+            rgba(var(--grid-color), var(--grid-opacity)) 1px,
+            transparent 1px
+          ),
+          linear-gradient(
+            to bottom,
+            rgba(var(--grid-color), var(--grid-opacity)) 1px,
+            transparent 1px
+          );
+
+        background-size:
+          var(--grid-size) var(--grid-size),
+          var(--grid-size) var(--grid-size);
+
+        background-position:
+          0 0,
+          0 0;
+        background-repeat: repeat, repeat;
+        mask: none;
+        -webkit-mask: none;
+      }
+
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: #b32dff #f0f0f0;
+      }
+
+      button span {
+        color: white;
+        -webkit-text-stroke: 1px rgba(6, 9, 9, 0.261);
+        text-shadow: 2px 2px 5px rgba(255, 212, 249, 0.5);
+      }
+    </style>
+  </head>
+  <body class="text-slate-100 antialiased h-full">
+    <div class="fondo_grande"></div>
+    <div class="bg-image"></div>
+    <div class="grid-overlay"></div>
+
+    <main class="relative h-full overflow-hidden">
+      <slot />
+    </main>
+  </body>
+</html>

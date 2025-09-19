@@ -1,0 +1,184 @@
+---
+import { Image } from "astro:assets";
+import Modal from "./Modal.astro";
+import logo from "/src/assets/images/logo.png";
+import Beneficios from "./Beneficios.astro";
+import RowRight from "../svg/RowRight.astro";
+import fondo from "/src/assets/images/fondo_animuss.png";
+---
+
+<Image
+  src={logo}
+  alt="logo animus"
+  class="w-20 absolute top-0 left-1/2 -translate-x-1/2 md:hidden"
+  loading="eager"
+  quality="high"
+/>
+
+<section class="relative mx-auto max-w-[1200px] h-full">
+  <div
+    class="relative grid md:grid-cols-12 h-full items-center overflow-visible"
+  >
+    <div
+      class="md:col-span-8 px-4 sm:px-6 md:px-8 lg:pl-24 lg:pr-8 pt-36 lg:pt-40 pb-28 lg:pb-20"
+    >
+      <Image
+        src={logo}
+        alt="logo animus"
+        class="hidden md:block w-28 absolute top-7"
+        loading="eager"
+        quality="high"
+      />
+      <div class="mt-7 md:mt-0">
+        <h1
+          class="font-extrabold leading-[0.95] text-white
+                 text-[clamp(2.75rem,7vw,5.25rem)] lg:text-[clamp(3rem,6vw,4rem)]
+                 drop-shadow-[0_4px_0_rgba(0,0,0,0.55)] tracking-tight"
+        >
+          UPGRADE<br class="sm:hidden" />
+          YOUR <br class="hidden sm:block" />
+          <span class="text-rosado-rojo">BODY</span>
+        </h1>
+
+        <div class="mt-2 mb-1 md:mt-4">
+          <button
+            data-modal-target="static-modal"
+            data-modal-toggle="static-modal"
+            type="button"
+            class="inline-flex items-center justify-center w-full sm:w-auto
+                   px-2 sm:px-8 lg:px-10 py-2 sm:py-4 lg:py-3
+                   text-[clamp(1.05rem,2.8vw,1.35rem)] lg:text-xl
+                   font-extrabold md:font-bold text-white italic
+                   bg-terciary-400 hover:bg-terciary-500 active:scale-[0.99]
+                   border-[6px] sm:border-[8px] border-rosado-rojo
+                   shadow-[0_0_30px_rgba(255,11,122,0.35)]
+                   focus:outline-none focus:ring-4 focus:ring-rosado-rojo/30
+                    transition-all hover:scale-95 cursor-pointer duration-200"
+          >
+            QUIERO MI UPGRADE AHORA
+            <RowRight
+              className="w-5 h-5 ml-2 text-white animate-pulse md:w-7 md:h-7"
+            />
+          </button>
+        </div>
+
+        <p
+          class="text-center sm:text-left text-white/70 text-xs sm:text-sm lg:text-base mt-2"
+        >
+          Oferta por tiempo limitado
+        </p>
+      </div>
+
+      <div
+        class="beneficios fixed left-0 right-0 bottom-0 z-10 px-5 py-8 sm:mx-6 sm:rounded-sm md:static md:mt-10 md:mx-0 md:px-6 md:py-6 md:max-w-[720px] md:rounded-md md:border md:border-white/20 hover:scale-95 duration-100"
+      >
+        <Beneficios />
+      </div>
+    </div>
+
+    <div class="hidden md:block md:col-span-4">
+      <Image
+        src={fondo}
+        alt="Ilustración de un fondo animus con un personaje"
+        class="w-full h-auto max-w-md lg:max-w-none mx-auto lg:mr-0 lg:ml-auto fondo_animus"
+        loading="eager"
+        quality="high"
+      />
+    </div>
+  </div>
+</section>
+
+<Modal />
+
+<style>
+  .beneficios {
+    background: linear-gradient(
+      to left,
+      rgba(1, 152, 160, 0.12),
+      rgba(112, 2, 116, 0.25)
+    );
+    backdrop-filter: blur(4px);
+    -webkit-mask-image: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 1) 90%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+    mask-image: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 1) 90%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    mask-repeat: no-repeat;
+    mask-size: 100% 100%;
+  }
+
+  @media (min-width: 768px) and (max-width: 1023.98px) {
+    .beneficios {
+      background: linear-gradient(
+        to top,
+        rgba(1, 152, 160, 0.1),
+        rgba(112, 2, 116, 0.18)
+      );
+      backdrop-filter: blur(3px);
+      -webkit-mask-image: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 1) 96%,
+        rgba(0, 0, 0, 0) 100%
+      );
+      mask-image: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 1) 96%,
+        rgba(0, 0, 0, 0) 100%
+      );
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .beneficios {
+      background: rgba(255, 255, 255, 0.04);
+      backdrop-filter: none;
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
+  }
+
+  .fondo_animus {
+    -webkit-mask-image: linear-gradient(
+        to bottom,
+        transparent 0%,
+        black 10%,
+        black 90%,
+        transparent 100%
+      ),
+      linear-gradient(
+        to right,
+        transparent 0%,
+        black 10%,
+        black 90%,
+        transparent 100%
+      );
+    -webkit-mask-composite: intersect;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: 100% 100%;
+
+    mask-image: linear-gradient(
+        to bottom,
+        transparent 0%,
+        black 20%,
+        black 90%,
+        transparent 100%
+      ),
+      linear-gradient(
+        to right,
+        transparent 0%,
+        black 20%,
+        black 90%,
+        transparent 100%
+      );
+    mask-composite: intersect;
+    mask-repeat: no-repeat;
+    mask-size: 95% 95%;
+  }
+</style>
