@@ -1,0 +1,458 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import CartIcon from "../../components/svg/CartIcon.astro";
+
+const BACKEND = import.meta.env.PUBLIC_BACKEND_URL || "http://localhost:3000";
+const OPPWA = import.meta.env.PUBLIC_OPPWA_URL || "https://eu-test.oppwa.com";
+
+const genId = () => {
+  const ts = Date.now().toString(36);
+  const rnd = Math.random().toString(36).slice(2, 10);
+  return `ORD_${ts}_${rnd}`.toUpperCase();
+};
+---
+
+<Layout
+  title="Pago - Animus Society"
+  description="Completa tu compra en Animus Society de forma segura y rápida"
+>
+  <style>
+    html,
+    body {
+      overflow: auto !important;
+      height: auto !important;
+    }
+  </style>
+
+  <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto mb-4">
+      <a
+        href="/"
+        class="inline-flex items-center justify-center w-10 h-10 text-gray-600 hover:text-gray-900 hover:bg-white rounded-full transition-all duration-200 shadow-sm border border-gray-200"
+      >
+        <svg
+          class="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+      </a>
+    </div>
+    
+    <div class="max-w-4xl mx-auto">
+      <div class="text-center mb-8">
+        <div
+          class="inline-flex items-center justify-center w-16 h-16 bg-gray-900 rounded-full mb-4"
+        >
+          <CartIcon className="w-8 h-8 text-white" />
+        </div>
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">Finalizar Compra</h1>
+        <p class="text-gray-600">
+          Completa tu información para procesar el pago
+        </p>
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-8">
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 class="text-xl font-semibold text-gray-900 mb-6">
+            Información de Pago
+          </h2>
+
+          <form id="pay-form" class="space-y-6" onsubmit="return false;">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label
+                  for="givenName"
+                  class="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Nombres
+                </label>
+                <input
+                  type="text"
+                  id="givenName"
+                  name="givenName"
+                  required
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-colors text-gray-900"
+                  placeholder="Juan"
+                />
+              </div>
+              <div>
+                <label
+                  for="middleName"
+                  class="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Segundo nombre
+                </label>
+                <input
+                  type="text"
+                  id="middleName"
+                  name="middleName"
+                  required
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-colors text-gray-900"
+                  placeholder="Pablo"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
+                for="surname"
+                class="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Apellidos
+              </label>
+              <input
+                type="text"
+                id="surname"
+                name="surname"
+                required
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-colors text-gray-900"
+                placeholder="Perez"
+              />
+            </div>
+
+            <!-- ID Cliente -->
+            <div>
+              <label
+                for="merchantCustomerId"
+                class="block text-sm font-medium text-gray-700 mb-2"
+              >
+                ID Cliente (1-16 caracteres)
+              </label>
+              <input
+                type="text"
+                id="merchantCustomerId"
+                name="merchantCustomerId"
+                required
+                maxlength="16"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-colors text-gray-900"
+                placeholder="USR123"
+              />
+            </div>
+
+            <!-- Información de Pago -->
+            <div class="border-t border-gray-200 pt-6">
+              <h3 class="text-lg font-medium text-gray-900 mb-4">
+                Información de Pago
+              </h3>
+
+              <div class="space-y-4">
+                <!-- Monto -->
+                <div>
+                  <label
+                    for="amount"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    Monto (USD) ≤ 50.00
+                  </label>
+                  <input
+                    type="text"
+                    id="amount"
+                    name="amount"
+                    required
+                    inputmode="decimal"
+                    value="49.99"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-colors text-gray-900"
+                    placeholder="1.00"
+                  />
+                </div>
+
+                <!-- ID de Transacción -->
+                <div>
+                  <label
+                    for="merchantTransactionId"
+                    class="block text-sm font-medium text-gray-700 mb-2"
+                  >
+                    ID de Transacción
+                  </label>
+                  <input
+                    type="text"
+                    id="merchantTransactionId"
+                    name="merchantTransactionId"
+                    required
+                    readonly
+                    value={genId()}
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-600"
+                  />
+                </div>
+
+                <!-- Desglose de Impuestos -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div>
+                    <label
+                      for="base0"
+                      class="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Base 0%
+                    </label>
+                    <input
+                      type="text"
+                      id="base0"
+                      name="base0"
+                      required
+                      value="0.00"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-colors text-gray-900"
+                      placeholder="0.00"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      for="baseImp"
+                      class="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      Base 12%
+                    </label>
+                    <input
+                      type="text"
+                      id="baseImp"
+                      name="baseImp"
+                      required
+                      value="44.63"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-colors text-gray-900"
+                      placeholder="0.90"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      for="iva"
+                      class="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                      IVA
+                    </label>
+                    <input
+                      type="text"
+                      id="iva"
+                      name="iva"
+                      required
+                      value="5.36"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-colors text-gray-900"
+                      placeholder="0.10"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <!-- Resumen del Pedido -->
+        <div
+          class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 h-fit"
+        >
+          <h2 class="text-xl font-semibold text-gray-900 mb-6">
+            Estado de la Transacción
+          </h2>
+
+          <div class="space-y-4">
+            <!-- Producto -->
+            <div
+              class="flex justify-between items-center py-3 border-b border-gray-200"
+            >
+              <div>
+                <h3 class="font-medium text-gray-900">
+                  Membresía Animus Society
+                </h3>
+                <p class="text-sm text-gray-600">Plan mensual completo</p>
+              </div>
+              <span class="font-semibold text-gray-900">$49.99</span>
+            </div>
+
+            <!-- Subtotal -->
+            <div class="flex justify-between items-center text-sm">
+              <span class="text-gray-600">Subtotal</span>
+              <span class="text-gray-900">$49.99</span>
+            </div>
+
+            <!-- Impuestos -->
+            <div class="flex justify-between items-center text-sm">
+              <span class="text-gray-600">Impuestos</span>
+              <span class="text-gray-900">$4.99</span>
+            </div>
+
+            <!-- Total -->
+            <div class="border-t border-gray-200 pt-4">
+              <div class="flex justify-between items-center">
+                <span class="text-lg font-semibold text-gray-900">Total</span>
+                <span class="text-2xl font-bold text-gray-900">$54.98</span>
+              </div>
+            </div>
+
+            <button
+              id="btn-create"
+              type="button"
+              class="w-full bg-gray-900 text-white py-3 px-4 rounded-md font-medium hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors mt-6"
+            >
+              Crear checkout y pagar
+            </button>
+
+            <div class="text-center text-sm text-gray-500 mt-2">
+              Se cargará el widget oficial del gateway
+            </div>
+
+            <div class="border-t border-gray-200 pt-6 mt-6">
+              <div class="text-sm text-gray-600 mb-4">
+                Marcas habilitadas:
+                <span
+                  class="inline-block bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs mx-1"
+                  >VISA</span
+                >
+                <span
+                  class="inline-block bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs mx-1"
+                  >MASTER</span
+                >
+                <span
+                  class="inline-block bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs mx-1"
+                  >AMEX</span
+                >
+                <span
+                  class="inline-block bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs mx-1"
+                  >DINERS</span
+                >
+                <span
+                  class="inline-block bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs mx-1"
+                  >DISCOVER</span
+                >
+              </div>
+              <div
+                id="widget-mount"
+                class="min-h-[200px] border border-gray-200 rounded-md p-4"
+              >
+              </div>
+            </div>
+
+            <div class="mt-4 p-3 bg-gray-50 rounded-md">
+              <div class="flex items-center">
+                <svg
+                  class="w-5 h-5 text-green-500 mr-2"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
+                    clip-rule="evenodd"></path>
+                </svg>
+                <span class="text-sm text-gray-600"
+                  >Pago 100% seguro y encriptado</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script define:vars={{ BACKEND, OPPWA }}>
+  console.log("Configuración inicial:");
+  console.log("BACKEND:", BACKEND);
+  console.log("OPPWA:", OPPWA);
+
+  const logEl = document.getElementById("log");
+  const log = (m, cls = "") => {
+    console.log("Log:", m);
+    if (!logEl) return;
+    const div = document.createElement("div");
+    div.className = cls;
+    div.textContent = typeof m === "string" ? m : JSON.stringify(m, null, 2);
+    logEl.appendChild(div);
+    logEl.scrollTop = logEl.scrollHeight;
+  };
+
+  log("Página de pago iniciada");
+  log(`Backend configurado: ${BACKEND}`);
+  log(`OPPWA configurado: ${OPPWA}`);
+
+  async function createCheckout(payload) {
+    const res = await fetch("/api/payments/checkouts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) throw new Error(await res.text());
+    return await res.json();
+  }
+
+  function loadWidget(checkoutId) {
+    const mount = document.getElementById("widget-mount");
+    if (!mount) return;
+    mount.innerHTML = `
+      <form action="${BACKEND}/api/payments/status" class="paymentWidgets"
+            data-brands="VISA MASTER AMEX DINERS DISCOVER"
+            data-shopper-result-url="${BACKEND}/api/payments/status">
+      </form>`;
+
+    const s = document.createElement("script");
+    s.src = `${OPPWA}/v1/paymentWidgets.js?checkoutId=${checkoutId}`;
+    s.async = true;
+    s.onload = () => log("Widget cargado ✓", "ok");
+    s.onerror = () => log("Error cargando widget", "err");
+    document.body.appendChild(s);
+  }
+
+  const btnCreate = document.getElementById("btn-create");
+  if (btnCreate) {
+    btnCreate.addEventListener("click", async () => {
+      log(`BACKEND URL: ${BACKEND}`);
+      log(`OPPWA URL: ${OPPWA}`);
+
+      const payForm = document.getElementById("pay-form");
+      if (!payForm) {
+        log("No se encontró el formulario", "err");
+        return;
+      }
+
+      const fd = new FormData(payForm);
+      const amount = String(fd.get("amount") || "1.00").trim();
+      if (parseFloat(amount) > 50) {
+        log("En sandbox, amount ≤ 50.00", "err");
+        return;
+      }
+
+      const payload = {
+        amount,
+        currency: "USD",
+        paymentType: "DB",
+        merchantTransactionId: String(fd.get("merchantTransactionId")),
+        givenName: String(fd.get("givenName")),
+        middleName: String(fd.get("middleName")),
+        surname: String(fd.get("surname")),
+        customerIp: "",
+        merchantCustomerId: String(fd.get("merchantCustomerId")),
+        base0: String(fd.get("base0")),
+        baseImp: String(fd.get("baseImp")),
+        iva: String(fd.get("iva")),
+      };
+
+      log("Payload a enviar:");
+      log(payload);
+
+      try {
+        log("Creando checkout...");
+        log(`URL destino: /api/payments/checkouts`);
+
+        const data = await createCheckout(payload);
+        log("Respuesta del servidor:");
+        log(data);
+
+        if (!data?.id) {
+          throw new Error("No se recibió checkoutId en la respuesta");
+        }
+
+        log(`CheckoutId recibido: ${data.id}`);
+        loadWidget(data.id);
+      } catch (e) {
+        const errorMessage = e instanceof Error ? e.message : String(e);
+        log(`Error completo: ${errorMessage}`, "err");
+        console.error("Error detallado:", e);
+      }
+    });
+  }
+</script>

@@ -4,6 +4,7 @@ import Modal from "./Modal.astro";
 import logo from "/src/assets/images/logo.png";
 import Beneficios from "./Beneficios.astro";
 import RowRight from "../svg/RowRight.astro";
+import CartIcon from "../svg/CartIcon.astro";
 import fondo from "/src/assets/images/fondo_animuss.png";
 ---
 
@@ -14,6 +15,15 @@ import fondo from "/src/assets/images/fondo_animuss.png";
   loading="eager"
   quality="high"
 />
+
+<a
+  href="/pay"
+  class="fixed bottom-6 right-6 z-20 md:hidden bg-terciary-400 hover:bg-terciary-500
+         p-4 rounded-full shadow-lg shadow-terciary-400/30 active:scale-95
+         transition-all duration-200 border-2 border-rosado-rojo inline-block"
+>
+  <CartIcon className="w-6 h-6 text-white" />
+</a>
 
 <section class="relative mx-auto max-w-[1200px] h-full">
   <div
@@ -29,6 +39,14 @@ import fondo from "/src/assets/images/fondo_animuss.png";
         loading="eager"
         quality="high"
       />
+
+      <a
+        href="/pay"
+        class="hidden md:block absolute top-17 right-26 hover:scale-125 active:scale-120
+               transition-all duration-200 cursor-pointer"
+      >
+        <CartIcon className="w-9 h-9 text-white" />
+      </a>
       <div class="mt-7 md:mt-0">
         <h1
           class="font-extrabold leading-[0.95] text-white
