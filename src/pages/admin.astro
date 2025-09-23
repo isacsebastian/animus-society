@@ -1,0 +1,100 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout
+  title="Admin Login | Animus Society"
+  description="Panel de administración para gestionar pagos y códigos de descuento"
+>
+  <main
+    class="bg-gray-50 min-h-screen flex items-center justify-center py-12 px-4"
+  >
+    <div
+      class="w-full max-w-sm bg-white rounded-xl shadow-lg border border-gray-200 p-8"
+    >
+      <div class="flex justify-center mb-6">
+        <img src="/icon.png" alt="Animus Society" class="w-16 h-16" />
+      </div>
+
+      <div class="text-center mb-8">
+        <h1 class="text-2xl font-bold text-black mb-1">Administrador</h1>
+        <p class="text-gray-600 text-sm">Animus Society</p>
+      </div>
+
+      <form id="loginForm" class="flex flex-col gap-4">
+        <input
+          id="username"
+          class="border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#6D4AEB] focus:border-transparent text-black placeholder-gray-500"
+          type="text"
+          placeholder="Usuario"
+          required
+          autocomplete="username"
+        />
+        <input
+          id="password"
+          class="border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#6D4AEB] focus:border-transparent text-black placeholder-gray-500"
+          type="password"
+          placeholder="Clave"
+          required
+          autocomplete="current-password"
+        />
+        <div
+          id="errorMessage"
+          class="text-red-600 text-sm text-center bg-red-50 p-3 rounded-lg border border-red-200 hidden"
+        >
+        </div>
+        <button
+          type="submit"
+          class="bg-[#6D4AEB] text-white font-semibold rounded-lg py-3 px-4 hover:bg-[#5A3CC7] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#6D4AEB]"
+        >
+          Ingresar
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const adminToken = localStorage.getItem("admin_token");
+      if (adminToken === "damian_authenticated") {
+        window.location.href = "/admin/dashboard";
+      }
+    });
+
+    const loginForm = document.getElementById("loginForm");
+    if (loginForm) {
+      loginForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const usernameEl = document.getElementById(
+          "username"
+        ) as HTMLInputElement;
+        const passwordEl = document.getElementById(
+          "password"
+        ) as HTMLInputElement;
+        const errorDiv = document.getElementById("errorMessage");
+
+        if (!usernameEl || !passwordEl || !errorDiv) return;
+
+        const username = usernameEl.value;
+        const password = passwordEl.value;
+
+        errorDiv.classList.add("hidden");
+
+        if (username === "damian" && password === "12345") {
+          localStorage.setItem("admin_token", "damian_authenticated");
+          localStorage.setItem("admin_user", "damian");
+          localStorage.setItem(
+            "admin_login_time",
+            new Date().getTime().toString()
+          );
+
+          window.location.href = "/admin/dashboard";
+        } else {
+          errorDiv.textContent = "Usuario o clave incorrectos";
+          errorDiv.classList.remove("hidden");
+        }
+      });
+    }
+  </script>
+</Layout>
