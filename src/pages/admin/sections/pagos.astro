@@ -1,0 +1,433 @@
+---
+import Layout from "../../../layouts/Layout.astro";
+---
+
+<Layout
+  title="Historial de Pagos | Animus Society"
+  description="Gestionar pagos y transacciones de Animus Society"
+>
+  <main class="bg-gray-50 min-h-screen flex flex-col items-center p-4">
+    <div
+      class="w-full max-w-6xl bg-white rounded-xl shadow-lg border border-gray-200 mt-8 p-6"
+    >
+      <div
+        class="flex justify-between items-center mb-8 pb-4 border-b border-gray-200"
+      >
+        <div class="flex items-center gap-3">
+          <button
+            onclick="window.location.href='/admin/dashboard'"
+            class="text-gray-600 hover:text-black p-2 rounded-lg hover:bg-gray-100 transition-colors mr-2"
+            title="Volver al dashboard"
+          >
+            <svg
+              class="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+          </button>
+          <img src="/icon.png" alt="Animus Society" class="w-10 h-10" />
+          <div>
+            <h1 class="text-2xl font-bold text-black">Historial de Pagos</h1>
+            <p class="text-gray-600 text-sm">
+              Gestionar transacciones y facturación
+            </p>
+          </div>
+        </div>
+        <button
+          id="logoutBtn"
+          class="text-gray-600 hover:text-black text-sm font-medium cursor-pointer bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-lg transition-colors"
+        >
+          Cerrar sesión
+        </button>
+      </div>
+
+      <div class="grid md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
+          <div class="flex items-center gap-3 mb-2">
+            <div
+              class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center"
+            >
+              <svg
+                class="w-6 h-6 text-green-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
+                ></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-sm font-medium text-gray-600">Ingresos Total</h3>
+              <p class="text-2xl font-bold text-green-600">$45,678</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
+          <div class="flex items-center gap-3 mb-2">
+            <div
+              class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center"
+            >
+              <svg
+                class="w-6 h-6 text-blue-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                ></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-sm font-medium text-gray-600">Pagos Exitosos</h3>
+              <p class="text-2xl font-bold text-blue-600">1,456</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
+          <div class="flex items-center gap-3 mb-2">
+            <div
+              class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center"
+            >
+              <svg
+                class="w-6 h-6 text-yellow-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-sm font-medium text-gray-600">Pendientes</h3>
+              <p class="text-2xl font-bold text-yellow-600">23</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
+          <div class="flex items-center gap-3 mb-2">
+            <div
+              class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center"
+            >
+              <svg
+                class="w-6 h-6 text-red-600"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-sm font-medium text-gray-600">Fallidos</h3>
+              <p class="text-2xl font-bold text-red-600">12</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
+        <div class="mb-6 flex flex-wrap gap-4">
+          <input
+            type="search"
+            placeholder="Buscar por usuario, ID de pago o referencia..."
+            class="flex-1 min-w-[250px] px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D4AEB] focus:border-transparent text-black placeholder-gray-500"
+          />
+          <input
+            type="date"
+            class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D4AEB] text-black"
+          />
+          <select
+            class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D4AEB] text-black"
+          >
+            <option value="todos">Todos los estados</option>
+            <option value="completado">Completados</option>
+            <option value="pendiente">Pendientes</option>
+            <option value="fallido">Fallidos</option>
+          </select>
+          <button
+            class="px-6 py-3 bg-[#6D4AEB] text-white rounded-lg hover:bg-[#5A3CC7] transition-colors font-medium"
+          >
+            Filtrar
+          </button>
+          <button
+            class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+          >
+            Exportar CSV
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table
+            class="w-full border-collapse bg-white rounded-lg shadow-sm border border-gray-200"
+          >
+            <thead>
+              <tr class="bg-gray-100">
+                <th
+                  class="border border-gray-200 px-4 py-3 text-left text-black font-semibold"
+                >
+                  ID Transacción
+                </th>
+                <th
+                  class="border border-gray-200 px-4 py-3 text-left text-black font-semibold"
+                >
+                  Usuario
+                </th>
+                <th
+                  class="border border-gray-200 px-4 py-3 text-left text-black font-semibold"
+                >
+                  Plan
+                </th>
+                <th
+                  class="border border-gray-200 px-4 py-3 text-left text-black font-semibold"
+                >
+                  Método de Pago
+                </th>
+                <th
+                  class="border border-gray-200 px-4 py-3 text-left text-black font-semibold"
+                >
+                  Monto
+                </th>
+                <th
+                  class="border border-gray-200 px-4 py-3 text-left text-black font-semibold"
+                >
+                  Fecha
+                </th>
+                <th
+                  class="border border-gray-200 px-4 py-3 text-left text-black font-semibold"
+                >
+                  Estado
+                </th>
+                <th
+                  class="border border-gray-200 px-4 py-3 text-left text-black font-semibold"
+                >
+                  Acciones
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td
+                  class="border border-gray-200 px-4 py-3 text-gray-700 font-mono text-sm"
+                >
+                  TXN_001567
+                </td>
+                <td class="border border-gray-200 px-4 py-3 text-gray-700">
+                  juan.perez@email.com
+                </td>
+                <td class="border border-gray-200 px-4 py-3">
+                  <span
+                    class="bg-[#6D4AEB]/10 text-[#6D4AEB] px-2 py-1 rounded text-sm font-medium"
+                  >
+                    Plan Premium
+                  </span>
+                </td>
+                <td class="border border-gray-200 px-4 py-3 text-gray-700">
+                  Tarjeta de Crédito
+                </td>
+                <td
+                  class="border border-gray-200 px-4 py-3 text-gray-700 font-semibold"
+                >
+                  $29.99
+                </td>
+                <td class="border border-gray-200 px-4 py-3 text-gray-700">
+                  2025-09-22 14:30
+                </td>
+                <td class="border border-gray-200 px-4 py-3">
+                  <span
+                    class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm"
+                  >
+                    Completado
+                  </span>
+                </td>
+                <td class="border border-gray-200 px-4 py-3">
+                  <div class="flex gap-2">
+                    <button
+                      class="text-[#6D4AEB] hover:text-[#5A3CC7] text-sm font-medium"
+                    >
+                      Ver Detalles
+                    </button>
+                    <button
+                      class="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                    >
+                      Recibo
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td
+                  class="border border-gray-200 px-4 py-3 text-gray-700 font-mono text-sm"
+                >
+                  TXN_001566
+                </td>
+                <td class="border border-gray-200 px-4 py-3 text-gray-700">
+                  maria.garcia@email.com
+                </td>
+                <td class="border border-gray-200 px-4 py-3">
+                  <span
+                    class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm font-medium"
+                  >
+                    Plan Básico
+                  </span>
+                </td>
+                <td class="border border-gray-200 px-4 py-3 text-gray-700">
+                  PayPal
+                </td>
+                <td
+                  class="border border-gray-200 px-4 py-3 text-gray-700 font-semibold"
+                >
+                  $19.99
+                </td>
+                <td class="border border-gray-200 px-4 py-3 text-gray-700">
+                  2025-09-21 16:45
+                </td>
+                <td class="border border-gray-200 px-4 py-3">
+                  <span
+                    class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-sm"
+                  >
+                    Pendiente
+                  </span>
+                </td>
+                <td class="border border-gray-200 px-4 py-3">
+                  <div class="flex gap-2">
+                    <button
+                      class="text-orange-600 hover:text-orange-700 text-sm font-medium"
+                    >
+                      Procesar
+                    </button>
+                    <button
+                      class="text-[#6D4AEB] hover:text-[#5A3CC7] text-sm font-medium"
+                    >
+                      Ver Detalles
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td
+                  class="border border-gray-200 px-4 py-3 text-gray-700 font-mono text-sm"
+                >
+                  TXN_001565
+                </td>
+                <td class="border border-gray-200 px-4 py-3 text-gray-700">
+                  carlos.rodriguez@email.com
+                </td>
+                <td class="border border-gray-200 px-4 py-3">
+                  <span
+                    class="bg-[#6D4AEB]/10 text-[#6D4AEB] px-2 py-1 rounded text-sm font-medium"
+                  >
+                    Plan Premium
+                  </span>
+                </td>
+                <td class="border border-gray-200 px-4 py-3 text-gray-700">
+                  Transferencia
+                </td>
+                <td
+                  class="border border-gray-200 px-4 py-3 text-gray-700 font-semibold"
+                >
+                  $29.99
+                </td>
+                <td class="border border-gray-200 px-4 py-3 text-gray-700">
+                  2025-09-20 09:15
+                </td>
+                <td class="border border-gray-200 px-4 py-3">
+                  <span
+                    class="bg-red-100 text-red-800 px-2 py-1 rounded text-sm"
+                  >
+                    Fallido
+                  </span>
+                </td>
+                <td class="border border-gray-200 px-4 py-3">
+                  <div class="flex gap-2">
+                    <button
+                      class="text-green-600 hover:text-green-700 text-sm font-medium"
+                    >
+                      Reintentar
+                    </button>
+                    <button
+                      class="text-[#6D4AEB] hover:text-[#5A3CC7] text-sm font-medium"
+                    >
+                      Ver Error
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const adminToken = localStorage.getItem("admin_token");
+      const adminUser = localStorage.getItem("admin_user");
+
+      if (
+        !adminToken ||
+        adminToken !== "damian_authenticated" ||
+        !adminUser ||
+        adminUser !== "damian"
+      ) {
+        window.location.href = "/admin";
+        return;
+      }
+
+      const loginTime = localStorage.getItem("admin_login_time");
+      if (loginTime) {
+        const currentTime = new Date().getTime();
+        const timeDiff = currentTime - parseInt(loginTime);
+        const hours = timeDiff / (1000 * 60 * 60);
+
+        if (hours > 24) {
+          localStorage.removeItem("admin_token");
+          localStorage.removeItem("admin_user");
+          localStorage.removeItem("admin_login_time");
+          window.location.href = "/admin";
+          return;
+        }
+      }
+    });
+
+    const logoutBtn = document.getElementById("logoutBtn");
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+
+        localStorage.removeItem("admin_token");
+        localStorage.removeItem("admin_user");
+        localStorage.removeItem("admin_login_time");
+
+        window.location.href = "/admin";
+      });
+    }
+  </script>
+</Layout>

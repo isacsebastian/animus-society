@@ -1,8 +1,5 @@
 ---
 import Layout from "../../layouts/Layout.astro";
-
-const url = new URL(Astro.request.url);
-const tab = url.searchParams.get("tab") || "pagos";
 ---
 
 <Layout
@@ -33,235 +30,90 @@ const tab = url.searchParams.get("tab") || "pagos";
         </button>
       </div>
 
-      <div class="flex flex-wrap gap-3 mb-8 justify-center">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <a
-          href="/admin/dashboard?tab=pagos"
-          class={`px-6 py-3 rounded-lg font-semibold transition-colors ${tab === "pagos" ? "bg-primary-600 text-white shadow-md" : "bg-gray-100 text-black hover:bg-gray-200"}`}
+          href="/admin/sections/usuarios"
+          class="bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-xl p-6 text-center transition-all duration-200 hover:shadow-md group"
         >
-          Historial de Pagos
+          <div class="flex justify-center mb-4">
+            <svg
+              class="w-12 h-12 text-gray-600 group-hover:text-[#6D4AEB] transition-colors"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              ></path>
+            </svg>
+          </div>
+          <h3
+            class="text-lg font-semibold text-black group-hover:text-[#6D4AEB] transition-colors"
+          >
+            Gestión de administradores
+          </h3>
+          <p class="text-sm text-gray-600 mt-2">
+            Administrar cuentas de administradores
+          </p>
         </a>
+
         <a
-          href="/admin/dashboard?tab=descuentos"
-          class={`px-6 py-3 rounded-lg font-semibold transition-colors ${tab === "descuentos" ? "bg-primary-600 text-white shadow-md" : "bg-gray-100 text-black hover:bg-gray-200"}`}
+          href="/admin/sections/pagos"
+          class="bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-xl p-6 text-center transition-all duration-200 hover:shadow-md group"
         >
-          Códigos de Descuento
+          <div class="flex justify-center mb-4">
+            <svg
+              class="w-12 h-12 text-gray-600 group-hover:text-[#6D4AEB] transition-colors"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              ></path>
+            </svg>
+          </div>
+          <h3
+            class="text-lg font-semibold text-black group-hover:text-[#6D4AEB] transition-colors"
+          >
+            Historial de Pagos
+          </h3>
+          <p class="text-sm text-gray-600 mt-2">Transacciones y facturación</p>
+        </a>
+
+        <a
+          href="/admin/sections/descuentos"
+          class="bg-gray-100 hover:bg-gray-200 border border-gray-200 rounded-xl p-6 text-center transition-all duration-200 hover:shadow-md group"
+        >
+          <div class="flex justify-center mb-4">
+            <svg
+              class="w-12 h-12 text-gray-600 group-hover:text-[#6D4AEB] transition-colors"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+              ></path>
+            </svg>
+          </div>
+          <h3
+            class="text-lg font-semibold text-black group-hover:text-[#6D4AEB] transition-colors"
+          >
+            Códigos de Descuento
+          </h3>
+          <p class="text-sm text-gray-600 mt-2">Promociones y cupones</p>
         </a>
       </div>
-
-      {
-        tab === "pagos" && (
-          <div class="w-full">
-            <h2 class="text-xl font-semibold mb-4 text-black">
-              Historial de Pagos
-            </h2>
-            <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
-              <div class="mb-4 flex flex-wrap gap-4">
-                <input
-                  type="search"
-                  placeholder="Buscar por usuario o ID de pago..."
-                  class="flex-1 min-w-[250px] px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-black placeholder-gray-500"
-                />
-                <input
-                  type="date"
-                  class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-black"
-                />
-                <button class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors font-medium">
-                  Filtrar
-                </button>
-              </div>
-
-              <div class="overflow-x-auto">
-                <table class="w-full border-collapse bg-white rounded-lg shadow-sm border border-gray-200">
-                  <thead>
-                    <tr class="bg-gray-100">
-                      <th class="border border-gray-200 px-4 py-3 text-left text-black font-semibold">
-                        ID
-                      </th>
-                      <th class="border border-gray-200 px-4 py-3 text-left text-black font-semibold">
-                        Usuario
-                      </th>
-                      <th class="border border-gray-200 px-4 py-3 text-left text-black font-semibold">
-                        Plan
-                      </th>
-                      <th class="border border-gray-200 px-4 py-3 text-left text-black font-semibold">
-                        Monto
-                      </th>
-                      <th class="border border-gray-200 px-4 py-3 text-left text-black font-semibold">
-                        Fecha
-                      </th>
-                      <th class="border border-gray-200 px-4 py-3 text-left text-black font-semibold">
-                        Estado
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td class="border border-gray-200 px-4 py-3 text-gray-700">
-                        #001
-                      </td>
-                      <td class="border border-gray-200 px-4 py-3 text-gray-700">
-                        juan.perez@email.com
-                      </td>
-                      <td class="border border-gray-200 px-4 py-3 text-gray-700">
-                        Plan Premium
-                      </td>
-                      <td class="border border-gray-200 px-4 py-3 text-gray-700">
-                        $29.99
-                      </td>
-                      <td class="border border-gray-200 px-4 py-3 text-gray-700">
-                        2025-09-22
-                      </td>
-                      <td class="border border-gray-200 px-4 py-3">
-                        <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">
-                          Completado
-                        </span>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td class="border border-gray-200 px-4 py-3 text-gray-700">
-                        #002
-                      </td>
-                      <td class="border border-gray-200 px-4 py-3 text-gray-700">
-                        maria.garcia@email.com
-                      </td>
-                      <td class="border border-gray-200 px-4 py-3 text-gray-700">
-                        Plan Básico
-                      </td>
-                      <td class="border border-gray-200 px-4 py-3 text-gray-700">
-                        $19.99
-                      </td>
-                      <td class="border border-gray-200 px-4 py-3 text-gray-700">
-                        2025-09-21
-                      </td>
-                      <td class="border border-gray-200 px-4 py-3">
-                        <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-sm">
-                          Pendiente
-                        </span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        )
-      }
-
-      {
-        tab === "descuentos" && (
-          <div class="w-full">
-            <h2 class="text-xl font-semibold mb-4 text-black">
-              Códigos de Descuento
-            </h2>
-
-            <div class="grid md:grid-cols-2 gap-6">
-              <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                <h3 class="text-lg font-semibold mb-4 text-black">
-                  Crear Nuevo Código
-                </h3>
-                <form class="space-y-4">
-                  <div>
-                    <label class="block text-sm font-medium text-black mb-1">
-                      Código
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="DESCUENTO2025"
-                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-black placeholder-gray-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label class="block text-sm font-medium text-black mb-1">
-                      Tipo de Descuento
-                    </label>
-                    <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-black">
-                      <option value="porcentaje">Porcentaje</option>
-                      <option value="valor">Valor Fijo</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label class="block text-sm font-medium text-black mb-1">
-                      Valor
-                    </label>
-                    <input
-                      type="number"
-                      placeholder="20"
-                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-black placeholder-gray-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label class="block text-sm font-medium text-black mb-1">
-                      Plan Aplicable
-                    </label>
-                    <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-black">
-                      <option value="todos">Todos los planes</option>
-                      <option value="basico">Plan Básico</option>
-                      <option value="premium">Plan Premium</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label class="block text-sm font-medium text-black mb-1">
-                      Fecha de Expiración
-                    </label>
-                    <input
-                      type="date"
-                      class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-black"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    class="w-full bg-primary-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-primary-700 transition-colors"
-                  >
-                    Crear Código
-                  </button>
-                </form>
-              </div>
-
-              <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                <h3 class="text-lg font-semibold mb-4 text-black">
-                  Códigos Existentes
-                </h3>
-                <div class="space-y-3">
-                  <div class="bg-white p-4 rounded border border-gray-200">
-                    <div class="flex justify-between items-start mb-2">
-                      <span class="font-mono font-semibold text-primary-600">
-                        DESCUENTO20
-                      </span>
-                      <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">
-                        Activo
-                      </span>
-                    </div>
-                    <p class="text-sm text-gray-600">
-                      20% de descuento - Todos los planes
-                    </p>
-                    <p class="text-xs text-gray-500">Expira: 2025-12-31</p>
-                  </div>
-
-                  <div class="bg-white p-4 rounded border border-gray-200">
-                    <div class="flex justify-between items-start mb-2">
-                      <span class="font-mono font-semibold text-primary-600">
-                        NUEVO50
-                      </span>
-                      <span class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-xs">
-                        Usado
-                      </span>
-                    </div>
-                    <p class="text-sm text-gray-600">
-                      $5.00 de descuento - Plan Básico
-                    </p>
-                    <p class="text-xs text-gray-500">Expira: 2025-10-31</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )
-      }
     </div>
   </main>
 
@@ -306,16 +158,6 @@ const tab = url.searchParams.get("tab") || "pagos";
         localStorage.removeItem("admin_login_time");
 
         window.location.href = "/admin";
-      });
-    }
-
-    const discountForm = document.querySelector("form");
-    if (discountForm) {
-      discountForm.addEventListener("submit", function (e) {
-        e.preventDefault();
-        alert(
-          "Funcionalidad de crear código implementada. Aquí conectarías con tu backend."
-        );
       });
     }
   </script>
