@@ -1,5 +1,6 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import Modal from "../../components/Modal.astro";
 ---
 
 <Layout
@@ -117,6 +118,16 @@ import Layout from "../../layouts/Layout.astro";
     </div>
   </main>
 
+  <Modal
+    id="logout-modal"
+    title="Cerrar Sesión"
+    message="¿Estás seguro de que deseas cerrar tu sesión de administrador? Tendrás que volver a iniciar sesión para acceder al panel."
+    confirmText="Cerrar Sesión"
+    cancelText="Cancelar"
+    confirmAction="logout"
+    isDangerous={true}
+  />
+
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const adminToken = localStorage.getItem("admin_token");
@@ -152,12 +163,7 @@ import Layout from "../../layouts/Layout.astro";
     if (logoutBtn) {
       logoutBtn.addEventListener("click", function (e) {
         e.preventDefault();
-
-        localStorage.removeItem("admin_token");
-        localStorage.removeItem("admin_user");
-        localStorage.removeItem("admin_login_time");
-
-        window.location.href = "/admin";
+        (window as any).showModal("logout-modal");
       });
     }
   </script>

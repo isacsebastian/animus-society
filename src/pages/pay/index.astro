@@ -385,7 +385,7 @@ const genId = () => {
     if (!mount) return;
     mount.innerHTML = `
       <form action="${BACKEND}/api/payments/status" class="paymentWidgets"
-            data-brands="VISA MASTER AMEX DINERS DISCOVER"
+            data-brands="VISA"
             data-shopper-result-url="${BACKEND}/api/payments/status">
       </form>`;
 
