@@ -130,8 +130,8 @@ import Modal from "../../components/Modal.astro";
 
   <script>
     document.addEventListener("DOMContentLoaded", function () {
-      const adminToken = localStorage.getItem("admin_token");
-      const adminUser = localStorage.getItem("admin_user");
+      const adminToken = localStorage.getItem("animus-admin-token");
+      const adminUser = localStorage.getItem("animus-admin-user");
 
       if (
         !adminToken ||
@@ -143,16 +143,16 @@ import Modal from "../../components/Modal.astro";
         return;
       }
 
-      const loginTime = localStorage.getItem("admin_login_time");
+      const loginTime = localStorage.getItem("animus-admin-login-time");
       if (loginTime) {
         const currentTime = new Date().getTime();
         const timeDiff = currentTime - parseInt(loginTime);
         const hours = timeDiff / (1000 * 60 * 60);
 
         if (hours > 24) {
-          localStorage.removeItem("admin_token");
-          localStorage.removeItem("admin_user");
-          localStorage.removeItem("admin_login_time");
+          localStorage.removeItem("animus-admin-token");
+          localStorage.removeItem("animus-admin-user");
+          localStorage.removeItem("animus-admin-login-time");
           window.location.href = "/admin";
           return;
         }

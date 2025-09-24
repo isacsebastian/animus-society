@@ -9,7 +9,7 @@ import Modal from "../../../components/Modal.astro";
 >
   <main class="bg-gray-50 min-h-screen flex flex-col items-center p-4">
     <div
-      class="w-full max-w-6xl bg-white rounded-xl shadow-lg border border-gray-200 mt-8 p-6"
+      class="w-full max-w-6xl bg-white rounded-xl shadow-lg border border-gray-200 mt-8 p-6 max-h-[calc(100vh-6rem)] overflow-y-auto"
     >
       <div
         class="flex justify-between items-center mb-8 pb-4 border-b border-gray-200"
@@ -71,7 +71,9 @@ import Modal from "../../../components/Modal.astro";
             </div>
             <div>
               <h3 class="text-sm font-medium text-gray-600">Códigos Activos</h3>
-              <p class="text-2xl font-bold text-green-600">15</p>
+              <p class="text-2xl font-bold text-green-600" id="stat-active">
+                0
+              </p>
             </div>
           </div>
         </div>
@@ -95,8 +97,8 @@ import Modal from "../../../components/Modal.astro";
               </svg>
             </div>
             <div>
-              <h3 class="text-sm font-medium text-gray-600">Usos Este Mes</h3>
-              <p class="text-2xl font-bold text-[#6D4AEB]">234</p>
+              <h3 class="text-sm font-medium text-gray-600">Total de Usos</h3>
+              <p class="text-2xl font-bold text-[#6D4AEB]" id="stat-uses">0</p>
             </div>
           </div>
         </div>
@@ -121,8 +123,8 @@ import Modal from "../../../components/Modal.astro";
               </svg>
             </div>
             <div>
-              <h3 class="text-sm font-medium text-gray-600">Descuento Total</h3>
-              <p class="text-2xl font-bold text-blue-600">$1,567</p>
+              <h3 class="text-sm font-medium text-gray-600">Total Códigos</h3>
+              <p class="text-2xl font-bold text-blue-600" id="stat-total">0</p>
             </div>
           </div>
         </div>
@@ -146,8 +148,12 @@ import Modal from "../../../components/Modal.astro";
               </svg>
             </div>
             <div>
-              <h3 class="text-sm font-medium text-gray-600">Por Expirar</h3>
-              <p class="text-2xl font-bold text-orange-600">3</p>
+              <h3 class="text-sm font-medium text-gray-600">
+                Códigos Expirados
+              </h3>
+              <p class="text-2xl font-bold text-orange-600" id="stat-expired">
+                0
+              </p>
             </div>
           </div>
         </div>
@@ -172,87 +178,120 @@ import Modal from "../../../components/Modal.astro";
             </svg>
             Crear Nuevo Código
           </h3>
-          <form id="discountForm" class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-black mb-1">
-                Código
-              </label>
-              <input
-                type="text"
-                placeholder="DESCUENTO2025"
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D4AEB] text-black placeholder-gray-500 uppercase"
-                maxlength="20"
-                required
-              />
-            </div>
+          <form id="create-code-form" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label class="block text-sm font-medium text-black mb-1">
+                  Nombre del Código
+                </label>
+                <input
+                  id="code-name"
+                  name="code-name"
+                  type="text"
+                  placeholder="DESCUENTO20"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D4AEB] text-black placeholder-gray-500 uppercase"
+                  required
+                />
+              </div>
 
-            <div>
-              <label class="block text-sm font-medium text-black mb-1">
-                Tipo de Descuento
-              </label>
-              <select
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D4AEB] text-black"
-              >
-                <option value="porcentaje">Porcentaje (%)</option>
-                <option value="valor">Valor Fijo ($)</option>
-              </select>
-            </div>
+              <div>
+                <label class="block text-sm font-medium text-black mb-1">
+                  Descripción
+                </label>
+                <input
+                  id="code-description"
+                  name="code-description"
+                  type="text"
+                  placeholder="20% de descuento en todos los planes"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D4AEB] text-black placeholder-gray-500"
+                  required
+                />
+              </div>
 
-            <div>
-              <label class="block text-sm font-medium text-black mb-1">
-                Valor del Descuento
-              </label>
-              <input
-                type="number"
-                placeholder="20"
-                min="1"
-                max="100"
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D4AEB] text-black placeholder-gray-500"
-                required
-              />
-            </div>
+              <div>
+                <label class="block text-sm font-medium text-black mb-1">
+                  Tipo de Descuento
+                </label>
+                <select
+                  id="discount-type"
+                  name="discount-type"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D4AEB] text-black"
+                  required
+                >
+                  <option value="">Selecciona un tipo</option>
+                  <option value="percentage">Porcentaje (%)</option>
+                  <option value="fixed">Monto Fijo ($)</option>
+                </select>
+              </div>
 
-            <div>
-              <label class="block text-sm font-medium text-black mb-1">
-                Plan Aplicable
-              </label>
-              <select
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D4AEB] text-black"
-              >
-                <option value="todos">Todos los planes</option>
-                <option value="basico">Plan Básico</option>
-                <option value="premium">Plan Premium</option>
-              </select>
-            </div>
+              <div>
+                <label class="block text-sm font-medium text-black mb-1">
+                  Valor del Descuento
+                </label>
+                <input
+                  id="discount-value"
+                  name="discount-value"
+                  type="number"
+                  placeholder="20"
+                  min="1"
+                  max="100"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D4AEB] text-black placeholder-gray-500"
+                  required
+                />
+              </div>
 
-            <div>
-              <label class="block text-sm font-medium text-black mb-1">
-                Límite de Usos
-              </label>
-              <input
-                type="number"
-                placeholder="100"
-                min="1"
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D4AEB] text-black placeholder-gray-500"
-              />
-            </div>
+              <div>
+                <label class="block text-sm font-medium text-black mb-1">
+                  Plan Aplicable
+                </label>
+                <select
+                  id="applicable-plan"
+                  name="applicable-plan"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D4AEB] text-black"
+                  required
+                >
+                  <option value="">Selecciona un plan</option>
+                  <option value="all">Todos los Planes</option>
+                  <option value="basico">Plan Básico</option>
+                  <option value="premium">Plan Premium</option>
+                  <option value="elite">Plan Elite</option>
+                </select>
+              </div>
 
-            <div>
-              <label class="block text-sm font-medium text-black mb-1">
-                Fecha de Expiración
-              </label>
-              <input
-                type="date"
-                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D4AEB] text-black"
-                required
-              />
+              <div>
+                <label class="block text-sm font-medium text-black mb-1">
+                  Máximo de Usos
+                </label>
+                <input
+                  id="max-uses"
+                  name="max-uses"
+                  type="number"
+                  placeholder="100"
+                  min="1"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D4AEB] text-black placeholder-gray-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-black mb-1">
+                  Fecha de Expiración
+                </label>
+                <input
+                  id="expiry-date"
+                  name="expiry-date"
+                  type="date"
+                  class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D4AEB] text-black"
+                  required
+                />
+              </div>
             </div>
 
             <button
               type="submit"
-              class="w-full bg-[#6D4AEB] text-white py-3 px-4 rounded-lg font-semibold hover:bg-[#5A3CC7] transition-colors"
+              class="w-full bg-[#6D4AEB] text-white py-3 px-6 rounded-lg hover:bg-[#5A3CC7] transition-colors font-medium"
             >
-              Crear Código de Descuento
+              Crear Código
             </button>
           </form>
         </div>
@@ -261,134 +300,29 @@ import Modal from "../../../components/Modal.astro";
           <div class="flex justify-between items-center mb-6">
             <h3 class="text-lg font-semibold text-black">Códigos Existentes</h3>
             <input
+              id="search-codes"
               type="search"
               placeholder="Buscar código..."
               class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D4AEB] text-black placeholder-gray-500 text-sm"
             />
           </div>
-          <div class="space-y-3 max-h-96 overflow-y-auto">
-            <div class="bg-white p-4 rounded border border-gray-200">
-              <div class="flex justify-between items-start mb-2">
-                <span class="font-mono font-semibold text-[#6D4AEB] text-lg">
-                  DESCUENTO20
-                </span>
-                <span
-                  class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium"
-                >
-                  Activo
-                </span>
-              </div>
-              <p class="text-sm text-gray-600 mb-1">
-                20% de descuento - Todos los planes
-              </p>
-              <p class="text-xs text-gray-500 mb-2">
-                Usos: 45/100 • Expira: 2025-12-31
-              </p>
-              <div class="flex gap-2">
-                <button
-                  class="text-[#6D4AEB] hover:text-[#5A3CC7] text-xs font-medium"
-                >
-                  Editar
-                </button>
-                <button
-                  class="text-red-600 hover:text-red-700 text-xs font-medium"
-                >
-                  Desactivar
-                </button>
-              </div>
-            </div>
-
-            <div class="bg-white p-4 rounded border border-gray-200">
-              <div class="flex justify-between items-start mb-2">
-                <span class="font-mono font-semibold text-[#6D4AEB] text-lg">
-                  NUEVO50
-                </span>
-                <span
-                  class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs font-medium"
-                >
-                  Por Expirar
-                </span>
-              </div>
-              <p class="text-sm text-gray-600 mb-1">
-                $5.00 de descuento - Plan Básico
-              </p>
-              <p class="text-xs text-gray-500 mb-2">
-                Usos: 23/50 • Expira: 2025-10-31
-              </p>
-              <div class="flex gap-2">
-                <button
-                  class="text-[#6D4AEB] hover:text-[#5A3CC7] text-xs font-medium"
-                >
-                  Extender
-                </button>
-                <button
-                  class="text-orange-600 hover:text-orange-700 text-xs font-medium"
-                >
-                  Editar
-                </button>
-              </div>
-            </div>
-
-            <div class="bg-white p-4 rounded border border-gray-200 opacity-75">
-              <div class="flex justify-between items-start mb-2">
-                <span class="font-mono font-semibold text-gray-500 text-lg">
-                  PROMO15
-                </span>
-                <span
-                  class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-medium"
-                >
-                  Expirado
-                </span>
-              </div>
-              <p class="text-sm text-gray-500 mb-1">
-                15% de descuento - Plan Premium
-              </p>
-              <p class="text-xs text-gray-400 mb-2">
-                Usos: 78/100 • Expiró: 2025-09-20
-              </p>
-              <div class="flex gap-2">
-                <button
-                  class="text-green-600 hover:text-green-700 text-xs font-medium"
-                >
-                  Reactivar
-                </button>
-                <button
-                  class="text-gray-500 hover:text-gray-600 text-xs font-medium"
-                >
-                  Archivar
-                </button>
-              </div>
-            </div>
-
-            <div class="bg-white p-4 rounded border border-gray-200">
-              <div class="flex justify-between items-start mb-2">
-                <span class="font-mono font-semibold text-[#6D4AEB] text-lg">
-                  PREMIUM30
-                </span>
-                <span
-                  class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-medium"
-                >
-                  Activo
-                </span>
-              </div>
-              <p class="text-sm text-gray-600 mb-1">
-                30% de descuento - Plan Premium
-              </p>
-              <p class="text-xs text-gray-500 mb-2">
-                Usos: 12/25 • Expira: 2025-11-30
-              </p>
-              <div class="flex gap-2">
-                <button
-                  class="text-[#6D4AEB] hover:text-[#5A3CC7] text-xs font-medium"
-                >
-                  Editar
-                </button>
-                <button
-                  class="text-red-600 hover:text-red-700 text-xs font-medium"
-                >
-                  Desactivar
-                </button>
-              </div>
+          <div id="codes-container" class="space-y-3 max-h-96 overflow-y-auto">
+            <div class="text-center py-8 text-gray-500">
+              <svg
+                class="w-12 h-12 mx-auto mb-4 text-gray-300"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+                ></path>
+              </svg>
+              <p>No hay códigos de descuento creados aún.</p>
+              <p class="text-sm">Crea tu primer código usando el formulario.</p>
             </div>
           </div>
         </div>
@@ -406,53 +340,524 @@ import Modal from "../../../components/Modal.astro";
     isDangerous={true}
   />
 
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const adminToken = localStorage.getItem("admin_token");
-      const adminUser = localStorage.getItem("admin_user");
+  <Modal
+    id="delete-modal"
+    title="Eliminar Código"
+    message="¿Estás seguro de que quieres eliminar este código permanentemente? Esta acción no se puede deshacer."
+    confirmText="Eliminar"
+    cancelText="Cancelar"
+    confirmAction="delete"
+    isDangerous={true}
+  />
 
-      if (
-        !adminToken ||
-        adminToken !== "damian_authenticated" ||
-        !adminUser ||
-        adminUser !== "damian"
-      ) {
+  <Modal
+    id="deactivate-modal"
+    title="Desactivar Código"
+    message="¿Estás seguro de que quieres desactivar este código? El código dejará de funcionar inmediatamente."
+    confirmText="Desactivar"
+    cancelText="Cancelar"
+    confirmAction="deactivate"
+    isDangerous={true}
+  />
+
+  <script is:inline>
+    // Estado global de la aplicación
+    let discountCodes = [];
+
+    document.addEventListener("DOMContentLoaded", function () {
+      const token = localStorage.getItem("animus-admin-token");
+      if (!token) {
         window.location.href = "/admin";
         return;
       }
 
-      const loginTime = localStorage.getItem("admin_login_time");
-      if (loginTime) {
-        const currentTime = new Date().getTime();
-        const timeDiff = currentTime - parseInt(loginTime);
-        const hours = timeDiff / (1000 * 60 * 60);
-
-        if (hours > 24) {
-          localStorage.removeItem("admin_token");
-          localStorage.removeItem("admin_user");
-          localStorage.removeItem("admin_login_time");
-          window.location.href = "/admin";
-          return;
-        }
-      }
+      // Inicializar la aplicación
+      initializeDiscountCodes();
+      setupEventListeners();
     });
 
-    const logoutBtn = document.getElementById("logoutBtn");
-    if (logoutBtn) {
-      logoutBtn.addEventListener("click", function (e) {
-        e.preventDefault();
-        (window as any).showModal("logout-modal");
+    function initializeDiscountCodes() {
+      // Cargar códigos desde localStorage si existen
+      const savedCodes = localStorage.getItem("animus-discount-codes");
+      console.log("Códigos guardados:", savedCodes);
+      if (savedCodes) {
+        try {
+          discountCodes = JSON.parse(savedCodes);
+          console.log("Códigos cargados:", discountCodes);
+        } catch (error) {
+          console.error("Error al parsear códigos:", error);
+          discountCodes = [];
+        }
+      }
+
+      updateDisplay();
+    }
+
+    function setupEventListeners() {
+      // Botón de logout
+      const logoutBtn = document.getElementById("logoutBtn");
+      if (logoutBtn) {
+        logoutBtn.addEventListener("click", function (e) {
+          e.preventDefault();
+          if (typeof window.showModal === "function") {
+            window.showModal("logout-modal");
+          } else {
+            if (
+              confirm(
+                "¿Estás seguro de que deseas cerrar tu sesión de administrador?"
+              )
+            ) {
+              localStorage.removeItem("animus-admin-token");
+              localStorage.removeItem("animus-admin-user");
+              localStorage.removeItem("animus-admin-login-time");
+              window.location.href = "/admin";
+            }
+          }
+        });
+      }
+
+      // Formulario de crear código
+      const createForm = document.getElementById("create-code-form");
+      createForm.addEventListener("submit", handleCreateCode);
+
+      // Búsqueda en tiempo real
+      const searchInput = document.getElementById("search-codes");
+      searchInput.addEventListener("input", handleSearch);
+
+      // Event listeners para eventos del modal
+      window.addEventListener("deleteCode", function (event) {
+        deleteCode(event.detail.id);
+      });
+
+      window.addEventListener("deactivateCode", function (event) {
+        deactivateCode(event.detail.id);
       });
     }
 
-    const discountForm = document.getElementById("discountForm");
-    if (discountForm) {
-      discountForm.addEventListener("submit", function (e) {
-        e.preventDefault();
-        alert(
-          "Código de descuento creado exitosamente. Aquí conectarías con tu backend."
-        );
-      });
+    function handleCreateCode(e) {
+      e.preventDefault();
+
+      const formData = new FormData(e.target);
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const editingId = submitBtn.dataset.editingId;
+
+      if (editingId) {
+        // Actualizar código existente
+        updateExistingCode(editingId, formData);
+      } else {
+        // Crear nuevo código
+        createNewCode(formData);
+      }
+
+      // Resetear formulario
+      e.target.reset();
+      submitBtn.textContent = "Crear Código";
+      delete submitBtn.dataset.editingId;
     }
+
+    function createNewCode(formData) {
+      console.log("Creando nuevo código...");
+      const newCode = {
+        id: Date.now().toString(),
+        code: formData.get("code-name").toUpperCase(),
+        description: formData.get("code-description"),
+        type: formData.get("discount-type"),
+        value: parseFloat(formData.get("discount-value")),
+        plan: formData.get("applicable-plan"),
+        maxUses: parseInt(formData.get("max-uses")),
+        currentUses: 0,
+        expiryDate: formData.get("expiry-date"),
+        status: "active",
+        createdAt: new Date().toISOString(),
+      };
+
+      console.log("Nuevo código:", newCode);
+
+      // Validar que el código no exista
+      if (discountCodes.some((code) => code.code === newCode.code)) {
+        showNotification("Ya existe un código con ese nombre", "error");
+        return;
+      }
+
+      // Agregar el nuevo código
+      discountCodes.unshift(newCode);
+      console.log("Códigos después de agregar:", discountCodes);
+      saveToLocalStorage();
+      updateDisplay();
+
+      showNotification("Código creado exitosamente", "success");
+    }
+
+    function updateExistingCode(editingId, formData) {
+      const codeIndex = discountCodes.findIndex((c) => c.id === editingId);
+      if (codeIndex !== -1) {
+        const updatedCode = {
+          ...discountCodes[codeIndex],
+          code: formData.get("code-name").toUpperCase(),
+          description: formData.get("code-description"),
+          type: formData.get("discount-type"),
+          value: parseFloat(formData.get("discount-value")),
+          plan: formData.get("applicable-plan"),
+          maxUses: parseInt(formData.get("max-uses")),
+          expiryDate: formData.get("expiry-date"),
+        };
+
+        discountCodes[codeIndex] = updatedCode;
+        saveToLocalStorage();
+        updateDisplay();
+
+        showNotification("Código actualizado exitosamente", "success");
+      }
+    }
+
+    function handleSearch(e) {
+      const searchTerm = e.target.value.toLowerCase();
+      updateCodesList(searchTerm);
+    }
+
+    function updateDisplay() {
+      updateStatistics();
+      updateCodesList();
+    }
+
+    function updateStatistics() {
+      const totalCodes = discountCodes.length;
+      const activeCodes = discountCodes.filter(
+        (code) => code.status === "active" && !isExpired(code)
+      ).length;
+      const expiredCodes = discountCodes.filter((code) =>
+        isExpired(code)
+      ).length;
+      const totalUses = discountCodes.reduce(
+        (sum, code) => sum + code.currentUses,
+        0
+      );
+
+      document.getElementById("stat-total").textContent = totalCodes;
+      document.getElementById("stat-active").textContent = activeCodes;
+      document.getElementById("stat-expired").textContent = expiredCodes;
+      document.getElementById("stat-uses").textContent = totalUses;
+    }
+
+    function updateCodesList(searchTerm = "") {
+      console.log(
+        "Actualizando lista de códigos. Total:",
+        discountCodes.length
+      );
+      const container = document.getElementById("codes-container");
+      let filteredCodes = discountCodes;
+
+      // Filtrar por búsqueda
+      if (searchTerm) {
+        filteredCodes = discountCodes.filter(
+          (code) =>
+            code.code.toLowerCase().includes(searchTerm) ||
+            code.description.toLowerCase().includes(searchTerm)
+        );
+      }
+
+      console.log("Códigos filtrados:", filteredCodes.length);
+
+      if (filteredCodes.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8 text-gray-500">
+            <svg class="w-12 h-12 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+            </svg>
+            <p>${searchTerm ? "No se encontraron códigos que coincidan con tu búsqueda." : "No hay códigos de descuento creados aún."}</p>
+            <p class="text-sm">${searchTerm ? "Intenta con otros términos de búsqueda." : "Crea tu primer código usando el formulario."}</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = filteredCodes
+        .map((code) => renderCodeCard(code))
+        .join("");
+    }
+
+    function renderCodeCard(code) {
+      const statusInfo = getStatusInfo(code);
+      const valueText =
+        code.type === "percentage"
+          ? `${code.value}% de descuento`
+          : `$${code.value} de descuento`;
+      const planText =
+        code.plan === "all"
+          ? "Todos los planes"
+          : `Plan ${capitalizeFirst(code.plan)}`;
+
+      return `
+        <div class="bg-white p-4 rounded border border-gray-200 ${statusInfo.class}">
+          <div class="flex justify-between items-start mb-2">
+            <span class="font-mono font-semibold ${statusInfo.textClass} text-lg">
+              ${code.code}
+            </span>
+            <span class="${statusInfo.badgeClass} px-2 py-1 rounded text-xs font-medium">
+              ${statusInfo.label}
+            </span>
+          </div>
+          <p class="text-sm ${statusInfo.textClass} mb-1">
+            ${valueText} - ${planText}
+          </p>
+          <p class="text-xs ${statusInfo.metaClass} mb-2">
+            Usos: ${code.currentUses}/${code.maxUses} • Expira: ${formatDate(code.expiryDate)}
+          </p>
+          <div class="flex gap-2">
+            ${renderActionButtons(code)}
+          </div>
+        </div>
+      `;
+    }
+
+    function getStatusInfo(code) {
+      if (isExpired(code)) {
+        return {
+          label: "Expirado",
+          badgeClass: "bg-red-100 text-red-800",
+          textClass: "text-gray-500",
+          metaClass: "text-gray-400",
+          class: "opacity-75",
+        };
+      }
+
+      if (isExpiringSoon(code)) {
+        return {
+          label: "Por Expirar",
+          badgeClass: "bg-orange-100 text-orange-800",
+          textClass: "text-gray-600",
+          metaClass: "text-gray-500",
+          class: "",
+        };
+      }
+
+      return {
+        label: "Activo",
+        badgeClass: "bg-green-100 text-green-800",
+        textClass: "text-gray-600",
+        metaClass: "text-gray-500",
+        class: "",
+      };
+    }
+
+    function renderActionButtons(code) {
+      if (isExpired(code)) {
+        return `
+          <button onclick="reactivateCode('${code.id}')" class="text-green-600 hover:text-green-700 text-xs font-medium">
+            Reactivar
+          </button>
+          <button onclick="showDeleteModal('${code.id}')" class="text-gray-500 hover:text-gray-600 text-xs font-medium">
+            Eliminar
+          </button>
+        `;
+      }
+
+      if (isExpiringSoon(code)) {
+        return `
+          <button onclick="editCode('${code.id}')" class="text-[#6D4AEB] hover:text-[#5A3CC7] text-xs font-medium">
+            Editar
+          </button>
+          <button onclick="showDeactivateModal('${code.id}')" class="text-orange-600 hover:text-orange-700 text-xs font-medium">
+            Desactivar
+          </button>
+        `;
+      }
+
+      return `
+        <button onclick="editCode('${code.id}')" class="text-[#6D4AEB] hover:text-[#5A3CC7] text-xs font-medium">
+          Editar
+        </button>
+        <button onclick="showDeactivateModal('${code.id}')" class="text-red-600 hover:text-red-700 text-xs font-medium">
+          Desactivar
+        </button>
+      `;
+    }
+
+    // Funciones de utilidad
+    function isExpired(code) {
+      return new Date(code.expiryDate) < new Date();
+    }
+
+    function isExpiringSoon(code) {
+      const expiryDate = new Date(code.expiryDate);
+      const today = new Date();
+      const daysUntilExpiry = (expiryDate - today) / (1000 * 60 * 60 * 24);
+      return daysUntilExpiry <= 7 && daysUntilExpiry > 0;
+    }
+
+    function formatDate(dateString) {
+      return new Date(dateString).toLocaleDateString("es-ES");
+    }
+
+    function capitalizeFirst(str) {
+      return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    function saveToLocalStorage() {
+      localStorage.setItem(
+        "animus-discount-codes",
+        JSON.stringify(discountCodes)
+      );
+    }
+
+    function showNotification(message, type = "info") {
+      const notification = document.createElement("div");
+
+      let styles, icon;
+      switch (type) {
+        case "success":
+          styles =
+            "bg-white border-l-4 border-l-green-500 text-gray-800 shadow-md";
+          icon = `<svg class="w-5 h-5 text-green-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                  </svg>`;
+          break;
+        case "error":
+          styles =
+            "bg-white border-l-4 border-l-red-500 text-gray-800 shadow-md";
+          icon = `<svg class="w-5 h-5 text-red-500 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>`;
+          break;
+        default:
+          styles =
+            "bg-white border-l-4 border-l-[#6D4AEB] text-gray-800 shadow-md";
+          icon = `<svg class="w-5 h-5 text-[#6D4AEB] mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>`;
+      }
+
+      notification.className = `fixed top-6 right-6 px-5 py-4 rounded-lg border border-gray-200 z-50 transition-all duration-300 transform translate-x-0 opacity-100 ${styles}`;
+      notification.innerHTML = `
+        <div class="flex items-start">
+          ${icon}
+          <div class="flex-1">
+            <p class="text-sm font-medium">${message}</p>
+          </div>
+          <button onclick="this.parentElement.parentElement.remove()" class="ml-4 text-gray-400 hover:text-gray-600 focus:outline-none">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+      `;
+
+      document.body.appendChild(notification);
+
+      // Animación de entrada
+      setTimeout(() => {
+        notification.style.transform = "translateX(0)";
+      }, 10);
+
+      // Remover después de 4 segundos con animación
+      setTimeout(() => {
+        notification.style.opacity = "0";
+        notification.style.transform = "translateX(100%)";
+        setTimeout(() => {
+          if (notification.parentNode) {
+            notification.remove();
+          }
+        }, 300);
+      }, 4000);
+    }
+
+    // Funciones de acciones (globales para onclick)
+    window.editCode = function (id) {
+      const code = discountCodes.find((c) => c.id === id);
+      if (!code) return;
+
+      // Llenar el formulario con los datos del código
+      document.getElementById("code-name").value = code.code;
+      document.getElementById("code-description").value = code.description;
+      document.getElementById("discount-type").value = code.type;
+      document.getElementById("discount-value").value = code.value;
+      document.getElementById("applicable-plan").value = code.plan;
+      document.getElementById("max-uses").value = code.maxUses;
+      document.getElementById("expiry-date").value = code.expiryDate;
+
+      // Cambiar el botón del formulario
+      const submitBtn = document.querySelector(
+        '#create-code-form button[type="submit"]'
+      );
+      submitBtn.textContent = "Actualizar Código";
+      submitBtn.dataset.editingId = id;
+
+      // Scroll al formulario
+      document
+        .getElementById("create-code-form")
+        .scrollIntoView({ behavior: "smooth" });
+
+      showNotification(
+        "Editando código. Modifica los campos y guarda los cambios.",
+        "info"
+      );
+    };
+
+    // Variable global para almacenar el ID del código a procesar
+    window.currentCodeId = null;
+
+    window.showDeactivateModal = function (id) {
+      window.currentCodeId = id;
+      if (typeof window.showModal === "function") {
+        window.showModal("deactivate-modal");
+      } else {
+        if (confirm("¿Estás seguro de que quieres desactivar este código?")) {
+          deactivateCode(id);
+        }
+      }
+    };
+
+    window.showDeleteModal = function (id) {
+      window.currentCodeId = id;
+      if (typeof window.showModal === "function") {
+        window.showModal("delete-modal");
+      } else {
+        if (
+          confirm(
+            "¿Estás seguro de que quieres eliminar este código permanentemente?"
+          )
+        ) {
+          deleteCode(id);
+        }
+      }
+    };
+
+    function deactivateCode(id) {
+      const codeIndex = discountCodes.findIndex((c) => c.id === id);
+      if (codeIndex !== -1) {
+        discountCodes[codeIndex].status = "inactive";
+        discountCodes[codeIndex].expiryDate = new Date()
+          .toISOString()
+          .split("T")[0];
+        saveToLocalStorage();
+        updateDisplay();
+        showNotification("Código desactivado exitosamente", "info");
+      }
+    }
+
+    function deleteCode(id) {
+      discountCodes = discountCodes.filter((c) => c.id !== id);
+      saveToLocalStorage();
+      updateDisplay();
+      showNotification("Código eliminado exitosamente", "info");
+    }
+
+    window.reactivateCode = function (id) {
+      const codeIndex = discountCodes.findIndex((c) => c.id === id);
+      if (codeIndex !== -1) {
+        // Extender la fecha por 1 día
+        const newExpiryDate = new Date();
+        newExpiryDate.setDate(newExpiryDate.getDate() + 1);
+
+        discountCodes[codeIndex].status = "active";
+        discountCodes[codeIndex].expiryDate = newExpiryDate
+          .toISOString()
+          .split("T")[0];
+
+        saveToLocalStorage();
+        updateDisplay();
+        showNotification("Código reactivado por 1 día", "success");
+      }
+    };
   </script>
 </Layout>

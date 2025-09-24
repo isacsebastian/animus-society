@@ -160,10 +160,30 @@ const {
 
           if (action === "logout") {
             // Lógica de logout
-            localStorage.removeItem("admin_token");
-            localStorage.removeItem("admin_user");
-            localStorage.removeItem("admin_login_time");
+            localStorage.removeItem("animus-admin-token");
+            localStorage.removeItem("animus-admin-user");
+            localStorage.removeItem("animus-admin-login-time");
             window.location.href = "/admin";
+          } else if (action === "delete") {
+            // Lógica de eliminar código - usar evento personalizado
+            const currentId = (window as any).currentCodeId;
+            if (currentId) {
+              const deleteEvent = new CustomEvent("deleteCode", {
+                detail: { id: currentId },
+              });
+              window.dispatchEvent(deleteEvent);
+              (window as any).currentCodeId = null;
+            }
+          } else if (action === "deactivate") {
+            // Lógica de desactivar código - usar evento personalizado
+            const currentId = (window as any).currentCodeId;
+            if (currentId) {
+              const deactivateEvent = new CustomEvent("deactivateCode", {
+                detail: { id: currentId },
+              });
+              window.dispatchEvent(deactivateEvent);
+              (window as any).currentCodeId = null;
+            }
           }
 
           hideModal(modalId);

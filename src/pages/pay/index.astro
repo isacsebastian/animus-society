@@ -22,6 +22,25 @@ const genId = () => {
       overflow: auto !important;
       height: auto !important;
     }
+
+    .plan-option input:checked + div {
+      border-color: #111827 !important;
+      background-color: #f9fafb !important;
+    }
+
+    .plan-tab.active {
+      background-color: white !important;
+      color: #111827 !important;
+      box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
+    }
+
+    .plan-option {
+      transition: all 0.2s ease-in-out;
+    }
+
+    .plan-option:hover div {
+      border-color: #6b7280 !important;
+    }
   </style>
 
   <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -44,7 +63,7 @@ const genId = () => {
         </svg>
       </a>
     </div>
-    
+
     <div class="max-w-4xl mx-auto">
       <div class="text-center mb-8">
         <div
@@ -136,32 +155,232 @@ const genId = () => {
               />
             </div>
 
-            <!-- Información de Pago -->
+            <!-- Selección de Plan -->
             <div class="border-t border-gray-200 pt-6">
               <h3 class="text-lg font-medium text-gray-900 mb-4">
-                Información de Pago
+                Selecciona tu Plan
               </h3>
 
-              <div class="space-y-4">
-                <!-- Monto -->
-                <div>
-                  <label
-                    for="amount"
-                    class="block text-sm font-medium text-gray-700 mb-2"
+              <!-- Tabs para tipo de plan -->
+              <div class="mb-6">
+                <div class="flex bg-gray-100 rounded-lg p-1">
+                  <button
+                    id="tab-gym"
+                    type="button"
+                    class="plan-tab flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors bg-white text-gray-900 shadow-sm active"
                   >
-                    Monto (USD) ≤ 50.00
-                  </label>
-                  <input
-                    type="text"
-                    id="amount"
-                    name="amount"
-                    required
-                    inputmode="decimal"
-                    value="49.99"
-                    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-colors text-gray-900"
-                    placeholder="1.00"
-                  />
+                    Gimnasio
+                  </button>
+                  <button
+                    id="tab-app"
+                    type="button"
+                    class="plan-tab flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors text-gray-600 hover:text-gray-900"
+                  >
+                    App
+                  </button>
+                  <button
+                    id="tab-test"
+                    type="button"
+                    class="plan-tab flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors text-gray-600 hover:text-gray-900"
+                  >
+                    Pruebas
+                  </button>
                 </div>
+              </div>
+
+              <!-- Planes Gimnasio -->
+              <div id="plans-gym" class="plan-section">
+                <div class="grid gap-4">
+                  <label class="plan-option cursor-pointer">
+                    <input
+                      type="radio"
+                      name="selectedPlan"
+                      value="gym-monthly"
+                      data-price="77.00"
+                      data-name="Animus Flow - Plan Mensual"
+                      data-description="Plan mensual gimnasio"
+                      class="sr-only"
+                    />
+                    <div
+                      class="flex items-center justify-between p-4 border-2 border-gray-200 rounded-lg hover:border-gray-900 transition-colors"
+                    >
+                      <div class="flex-1">
+                        <h4 class="font-medium text-gray-900">Animus Flow</h4>
+                        <p class="text-sm text-gray-600">
+                          Plan mensual recurrente
+                        </p>
+                      </div>
+                      <div class="text-right">
+                        <span class="text-2xl font-bold text-gray-900">$77</span
+                        >
+                        <p class="text-sm text-gray-600">/mes</p>
+                      </div>
+                    </div>
+                  </label>
+
+                  <label class="plan-option cursor-pointer">
+                    <input
+                      type="radio"
+                      name="selectedPlan"
+                      value="gym-yearly"
+                      data-price="799.00"
+                      data-name="Animus Legacy - Plan Anual"
+                      data-description="Plan anual gimnasio"
+                      class="sr-only"
+                    />
+                    <div
+                      class="flex items-center justify-between p-4 border-2 border-gray-200 rounded-lg hover:border-gray-900 transition-colors relative"
+                    >
+                      <span
+                        class="absolute -top-2 right-4 bg-yellow-500 text-gray-900 text-xs font-bold px-2 py-1 rounded-full"
+                      >
+                        Más popular
+                      </span>
+                      <div class="flex-1">
+                        <h4 class="font-medium text-gray-900">Animus Legacy</h4>
+                        <p class="text-sm text-gray-600">Plan anual completo</p>
+                      </div>
+                      <div class="text-right">
+                        <span class="text-2xl font-bold text-gray-900"
+                          >$799</span
+                        >
+                        <p class="text-sm text-gray-600">/año</p>
+                      </div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Planes App -->
+              <div id="plans-app" class="plan-section hidden">
+                <div class="grid gap-4">
+                  <label class="plan-option cursor-pointer">
+                    <input
+                      type="radio"
+                      name="selectedPlan"
+                      value="app-monthly"
+                      data-price="19.99"
+                      data-name="Animus Flow Online - Plan Mensual"
+                      data-description="Plan mensual online"
+                      class="sr-only"
+                    />
+                    <div
+                      class="flex items-center justify-between p-4 border-2 border-gray-200 rounded-lg hover:border-gray-900 transition-colors"
+                    >
+                      <div class="flex-1">
+                        <h4 class="font-medium text-gray-900">
+                          Animus Flow Online
+                        </h4>
+                        <p class="text-sm text-gray-600">
+                          Plan mensual sin compromiso
+                        </p>
+                      </div>
+                      <div class="text-right">
+                        <span class="text-2xl font-bold text-gray-900"
+                          >$19<span class="text-lg">.99</span></span
+                        >
+                        <p class="text-sm text-gray-600">/mes</p>
+                      </div>
+                    </div>
+                  </label>
+
+                  <label class="plan-option cursor-pointer">
+                    <input
+                      type="radio"
+                      name="selectedPlan"
+                      value="app-yearly"
+                      data-price="199.00"
+                      data-name="Animus Legacy Online - Plan Anual"
+                      data-description="Plan anual online"
+                      class="sr-only"
+                    />
+                    <div
+                      class="flex items-center justify-between p-4 border-2 border-gray-200 rounded-lg hover:border-gray-900 transition-colors relative"
+                    >
+                      <span
+                        class="absolute -top-2 right-4 bg-yellow-500 text-gray-900 text-xs font-bold px-2 py-1 rounded-full"
+                      >
+                        Más popular
+                      </span>
+                      <div class="flex-1">
+                        <h4 class="font-medium text-gray-900">
+                          Animus Legacy Online
+                        </h4>
+                        <p class="text-sm text-gray-600">Plan anual completo</p>
+                      </div>
+                      <div class="text-right">
+                        <span class="text-2xl font-bold text-gray-900"
+                          >$199</span
+                        >
+                        <p class="text-sm text-gray-600">/año</p>
+                      </div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Planes de Prueba -->
+              <div id="plans-test" class="plan-section hidden">
+                <div class="grid gap-4">
+                  <label class="plan-option cursor-pointer">
+                    <input
+                      type="radio"
+                      name="selectedPlan"
+                      value="test-gym"
+                      data-price="1.00"
+                      data-name="Prueba Gimnasio - 1 Día"
+                      data-description="Acceso de prueba gimnasio"
+                      class="sr-only"
+                    />
+                    <div
+                      class="flex items-center justify-between p-4 border-2 border-gray-200 rounded-lg hover:border-gray-900 transition-colors"
+                    >
+                      <div class="flex-1">
+                        <h4 class="font-medium text-gray-900">
+                          Prueba Gimnasio
+                        </h4>
+                        <p class="text-sm text-gray-600">
+                          Acceso de 1 día al gimnasio
+                        </p>
+                      </div>
+                      <div class="text-right">
+                        <span class="text-2xl font-bold text-gray-900">$1</span>
+                        <p class="text-sm text-gray-600">/día</p>
+                      </div>
+                    </div>
+                  </label>
+
+                  <label class="plan-option cursor-pointer">
+                    <input
+                      type="radio"
+                      name="selectedPlan"
+                      value="test-app"
+                      data-price="1.00"
+                      data-name="Prueba App - 1 Día"
+                      data-description="Acceso de prueba app"
+                      class="sr-only"
+                    />
+                    <div
+                      class="flex items-center justify-between p-4 border-2 border-gray-200 rounded-lg hover:border-gray-900 transition-colors"
+                    >
+                      <div class="flex-1">
+                        <h4 class="font-medium text-gray-900">Prueba App</h4>
+                        <p class="text-sm text-gray-600">
+                          Acceso de 1 día a la app
+                        </p>
+                      </div>
+                      <div class="text-right">
+                        <span class="text-2xl font-bold text-gray-900">$1</span>
+                        <p class="text-sm text-gray-600">/día</p>
+                      </div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <div class="space-y-4 mt-6">
+                <!-- Monto (oculto, se actualiza automáticamente) -->
+                <input type="hidden" id="amount" name="amount" value="77.00" />
 
                 <!-- ID de Transacción -->
                 <div>
@@ -182,7 +401,7 @@ const genId = () => {
                   />
                 </div>
 
-                <!-- Desglose de Impuestos -->
+                <!-- Desglose de Impuestos (calculados automáticamente) -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <label
@@ -196,9 +415,9 @@ const genId = () => {
                       id="base0"
                       name="base0"
                       required
+                      readonly
                       value="0.00"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-colors text-gray-900"
-                      placeholder="0.00"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-600"
                     />
                   </div>
                   <div>
@@ -213,9 +432,9 @@ const genId = () => {
                       id="baseImp"
                       name="baseImp"
                       required
-                      value="44.63"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-colors text-gray-900"
-                      placeholder="0.90"
+                      readonly
+                      value="68.75"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-600"
                     />
                   </div>
                   <div>
@@ -223,16 +442,16 @@ const genId = () => {
                       for="iva"
                       class="block text-sm font-medium text-gray-700 mb-2"
                     >
-                      IVA
+                      IVA (12%)
                     </label>
                     <input
                       type="text"
                       id="iva"
                       name="iva"
                       required
-                      value="5.36"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-colors text-gray-900"
-                      placeholder="0.10"
+                      readonly
+                      value="8.25"
+                      class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-600"
                     />
                   </div>
                 </div>
@@ -255,31 +474,38 @@ const genId = () => {
               class="flex justify-between items-center py-3 border-b border-gray-200"
             >
               <div>
-                <h3 class="font-medium text-gray-900">
-                  Membresía Animus Society
+                <h3 id="summary-plan-name" class="font-medium text-gray-900">
+                  Animus Flow - Plan Mensual
                 </h3>
-                <p class="text-sm text-gray-600">Plan mensual completo</p>
+                <p id="summary-plan-description" class="text-sm text-gray-600">
+                  Plan mensual gimnasio
+                </p>
               </div>
-              <span class="font-semibold text-gray-900">$49.99</span>
+              <span id="summary-plan-price" class="font-semibold text-gray-900"
+                >$77.00</span
+              >
             </div>
 
             <!-- Subtotal -->
             <div class="flex justify-between items-center text-sm">
               <span class="text-gray-600">Subtotal</span>
-              <span class="text-gray-900">$49.99</span>
+              <span id="summary-subtotal" class="text-gray-900">$77.00</span>
             </div>
 
             <!-- Impuestos -->
             <div class="flex justify-between items-center text-sm">
-              <span class="text-gray-600">Impuestos</span>
-              <span class="text-gray-900">$4.99</span>
+              <span class="text-gray-600">Impuestos (12%)</span>
+              <span id="summary-tax" class="text-gray-900">$9.24</span>
             </div>
 
             <!-- Total -->
             <div class="border-t border-gray-200 pt-4">
               <div class="flex justify-between items-center">
                 <span class="text-lg font-semibold text-gray-900">Total</span>
-                <span class="text-2xl font-bold text-gray-900">$54.98</span>
+                <span
+                  id="summary-total"
+                  class="text-2xl font-bold text-gray-900">$86.24</span
+                >
               </div>
             </div>
 
@@ -370,6 +596,124 @@ const genId = () => {
   log(`Backend configurado: ${BACKEND}`);
   log(`OPPWA configurado: ${OPPWA}`);
 
+  // Funciones para calcular impuestos
+  function calculateTax(basePrice) {
+    const base = parseFloat(basePrice);
+    const taxRate = 0.12; // 12%
+    const baseImp = base / (1 + taxRate);
+    const tax = base - baseImp;
+
+    return {
+      baseImp: baseImp,
+      tax: tax,
+      total: base,
+    };
+  }
+
+  function updatePricing(price, planName, planDescription) {
+    const calculation = calculateTax(price);
+
+    // Actualizar campos del formulario
+    document.getElementById("amount").value = price.toFixed(2);
+    document.getElementById("base0").value = "0.00";
+    document.getElementById("baseImp").value = calculation.baseImp.toFixed(2);
+    document.getElementById("iva").value = calculation.tax.toFixed(2);
+
+    // Actualizar resumen
+    document.getElementById("summary-plan-name").textContent = planName;
+    document.getElementById("summary-plan-description").textContent =
+      planDescription;
+    document.getElementById("summary-plan-price").textContent =
+      `$${price.toFixed(2)}`;
+    // Subtotal sin IVA (base imponible)
+    document.getElementById("summary-subtotal").textContent =
+      `$${calculation.baseImp.toFixed(2)}`;
+    document.getElementById("summary-tax").textContent =
+      `$${calculation.tax.toFixed(2)}`;
+    document.getElementById("summary-total").textContent =
+      `$${calculation.total.toFixed(2)}`;
+  }
+
+  // Inicialización del DOM
+  document.addEventListener("DOMContentLoaded", function () {
+    // Tabs de categorías
+    const planTabs = document.querySelectorAll(".plan-tab");
+    const planSections = document.querySelectorAll(".plan-section");
+
+    planTabs.forEach((tab) => {
+      tab.addEventListener("click", function () {
+        const targetSection = this.id.replace("tab-", "plans-");
+
+        // Actualizar tabs activos
+        planTabs.forEach((t) => {
+          t.classList.remove(
+            "active",
+            "bg-white",
+            "text-gray-900",
+            "shadow-sm"
+          );
+          t.classList.add("text-gray-600", "hover:text-gray-900");
+        });
+
+        this.classList.add("active", "bg-white", "text-gray-900", "shadow-sm");
+        this.classList.remove("text-gray-600", "hover:text-gray-900");
+
+        // Mostrar sección correspondiente
+        planSections.forEach((section) => {
+          section.classList.add("hidden");
+        });
+
+        document.getElementById(targetSection).classList.remove("hidden");
+
+        // Seleccionar el primer plan de la nueva sección
+        const firstPlan = document.querySelector(
+          `#${targetSection} input[name="selectedPlan"]`
+        );
+        if (firstPlan) {
+          firstPlan.checked = true;
+          selectPlan(firstPlan);
+        }
+      });
+    });
+
+    // Selección de planes
+    const planOptions = document.querySelectorAll('input[name="selectedPlan"]');
+
+    function selectPlan(planInput) {
+      const price = parseFloat(planInput.getAttribute("data-price"));
+      const planName = planInput.getAttribute("data-name");
+      const planDescription = planInput.getAttribute("data-description");
+
+      // Actualizar estilos visuales
+      document.querySelectorAll(".plan-option > div").forEach((div) => {
+        div.classList.remove("border-gray-900", "bg-gray-50");
+        div.classList.add("border-gray-200");
+      });
+
+      const selectedDiv = planInput.parentElement.querySelector("div");
+      selectedDiv.classList.add("border-gray-900", "bg-gray-50");
+      selectedDiv.classList.remove("border-gray-200");
+
+      // Actualizar precios
+      updatePricing(price, planName, planDescription);
+    }
+
+    planOptions.forEach((option) => {
+      option.addEventListener("change", function () {
+        if (this.checked) {
+          selectPlan(this);
+        }
+      });
+    });
+
+    // Seleccionar el primer plan por defecto
+    const defaultPlan = document.querySelector('input[name="selectedPlan"]');
+    if (defaultPlan) {
+      defaultPlan.checked = true;
+      selectPlan(defaultPlan);
+    }
+  });
+
   async function createCheckout(payload) {
     const res = await fetch("/api/payments/checkouts", {
       method: "POST",
@@ -411,8 +755,20 @@ const genId = () => {
 
       const fd = new FormData(payForm);
       const amount = String(fd.get("amount") || "1.00").trim();
-      if (parseFloat(amount) > 50) {
+
+      // Verificar que se haya seleccionado un plan
+      const selectedPlan = document.querySelector(
+        'input[name="selectedPlan"]:checked'
+      );
+      if (!selectedPlan) {
+        alert("Por favor selecciona un plan");
+        return;
+      }
+
+      // Solo validar límite para planes que no sean de prueba (test)
+      if (!selectedPlan.value.includes("test") && parseFloat(amount) > 50) {
         log("En sandbox, amount ≤ 50.00", "err");
+        alert("En el ambiente de pruebas, el monto debe ser ≤ $50.00");
         return;
       }
 
@@ -452,6 +808,7 @@ const genId = () => {
         const errorMessage = e instanceof Error ? e.message : String(e);
         log(`Error completo: ${errorMessage}`, "err");
         console.error("Error detallado:", e);
+        alert(`Error al procesar el pago: ${errorMessage}`);
       }
     });
   }
