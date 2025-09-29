@@ -6,9 +6,7 @@ const BACKEND = import.meta.env.PUBLIC_BACKEND_URL || "http://localhost:3000";
 const OPPWA = import.meta.env.PUBLIC_OPPWA_URL || "https://eu-test.oppwa.com";
 
 const genId = () => {
-  const ts = Date.now().toString(36);
-  const rnd = Math.random().toString(36).slice(2, 10);
-  return `ORD_${ts}_${rnd}`.toUpperCase();
+  return `ORD_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`.toUpperCase();
 };
 ---
 
@@ -445,7 +443,7 @@ const genId = () => {
                       for="baseImp"
                       class="block text-sm font-medium text-gray-700 mb-2"
                     >
-                      Base 12%
+                      Base 15%
                     </label>
                     <input
                       type="text"
@@ -453,7 +451,7 @@ const genId = () => {
                       name="baseImp"
                       required
                       readonly
-                      value="68.75"
+                      value="66.96"
                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-600"
                     />
                   </div>
@@ -462,7 +460,7 @@ const genId = () => {
                       for="iva"
                       class="block text-sm font-medium text-gray-700 mb-2"
                     >
-                      IVA (12%)
+                      IVA (15%)
                     </label>
                     <input
                       type="text"
@@ -470,7 +468,7 @@ const genId = () => {
                       name="iva"
                       required
                       readonly
-                      value="8.25"
+                      value="10.04"
                       class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-600"
                     />
                   </div>
@@ -514,8 +512,8 @@ const genId = () => {
 
             <!-- Impuestos -->
             <div class="flex justify-between items-center text-sm">
-              <span class="text-gray-600">Impuestos (12%)</span>
-              <span id="summary-tax" class="text-gray-900">$9.24</span>
+              <span class="text-gray-600">Impuestos (15%)</span>
+              <span id="summary-tax" class="text-gray-900">$10.04</span>
             </div>
 
             <!-- Total -->
@@ -597,10 +595,6 @@ const genId = () => {
 </Layout>
 
 <script define:vars={{ BACKEND, OPPWA }}>
-  console.log("Configuración inicial:");
-  console.log("BACKEND:", BACKEND);
-  console.log("OPPWA:", OPPWA);
-
   const logEl = document.getElementById("log");
   const log = (m, cls = "") => {
     console.log("Log:", m);
@@ -616,18 +610,13 @@ const genId = () => {
   log(`Backend configurado: ${BACKEND}`);
   log(`OPPWA configurado: ${OPPWA}`);
 
-  // Funciones para calcular impuestos
   function calculateTax(basePrice) {
     const base = parseFloat(basePrice);
-    const taxRate = 0.12; // 12%
+    const taxRate = 0.15;
     const baseImp = base / (1 + taxRate);
     const tax = base - baseImp;
 
-    return {
-      baseImp: baseImp,
-      tax: tax,
-      total: base,
-    };
+    return { baseImp, tax, total: base };
   }
 
   function updatePricing(price, planName, planDescription) {
@@ -734,7 +723,6 @@ const genId = () => {
     }
   });
 
-  // Pago único (planes anuales) - función original
   async function createCheckout(payload) {
     const res = await fetch("/api/payments/checkouts", {
       method: "POST",
@@ -745,7 +733,6 @@ const genId = () => {
     return await res.json();
   }
 
-  // Suscripción (planes mensuales) - nueva función
   async function createSubscriptionCheckout(payload) {
     const res = await fetch("/api/payments/subscriptions/checkout", {
       method: "POST",
@@ -756,7 +743,6 @@ const genId = () => {
     return await res.json();
   }
 
-  // Completar configuración de suscripción - nueva función
   async function completeSubscription(resourcePath, customerId, planType) {
     const res = await fetch("/api/payments/subscriptions/complete", {
       method: "POST",
@@ -767,6 +753,7 @@ const genId = () => {
     return await res.json();
   }
 
+  // === NUEVA versión, sin diseño extra en el widget ===
   function loadWidget(
     checkoutId,
     isSubscription = false,
@@ -775,78 +762,58 @@ const genId = () => {
     const mount = document.getElementById("widget-mount");
     if (!mount) return;
 
-    // URL de retorno que devuelve JSON puro
-    let callbackUrl;
-    if (isSubscription && subscriptionData) {
-      // Para suscripciones, redirigir al endpoint JSON
-      callbackUrl = `${BACKEND}/api/payments/json-response?type=subscription&customerId=${subscriptionData.customerId}&planType=${subscriptionData.planType}`;
-    } else {
-      // Para pagos únicos, redirigir al endpoint JSON
-      callbackUrl = `${BACKEND}/api/payments/json-response?type=onetime`;
-    }
+    const callbackUrl =
+      isSubscription && subscriptionData
+        ? `${BACKEND}/api/payments/json-response?type=subscription&customerId=${subscriptionData.customerId}&planType=${subscriptionData.planType}`
+        : `${BACKEND}/api/payments/json-response?type=onetime`;
 
-    // Widget CON callback que devuelve JSON puro
     mount.innerHTML = `
       <form action="${callbackUrl}" class="paymentWidgets"
-            data-brands="VISA MASTER AMEX"
+            data-brands="VISA MASTER AMEX DINERS DISCOVER"
             data-shopper-result-url="${callbackUrl}">
       </form>`;
 
+    // 1) Opciones ANTES del script. Sin custom UI, solo colores internos.
+    window.wpwlOptions = {
+      style: "card",
+      locale: "es",
+      labels: {
+        cvv: "Código de verificación",
+        cardHolder: "Nombre (Igual que en la tarjeta)",
+      },
+      onReady: function () {
+        // Solo imagen/sello de Datafast (sin modificar diseño del formulario)
+        const cardForm = document.querySelector("form.wpwl-form-card");
+        const button = cardForm?.querySelector(".wpwl-button");
+        const trust =
+          '<div style="text-align:center;margin-top:8px;">' +
+          '  <img src="https://www.datafast.com.ec/images/verified.png" style="max-width:180px;opacity:.9;" alt="Datafast Secure"/>' +
+          "</div>";
+        button?.insertAdjacentHTML("afterend", trust);
+      },
+    };
+
+    if (isSubscription) {
+      // Solo la parte funcional de registro; sin UI extra
+      window.wpwlOptions.registrations = {
+        requireCvv: true,
+        hideInitialPaymentForms: false,
+      };
+    }
+
+    // 2) Cargar script del widget
     const s = document.createElement("script");
     s.src = `${OPPWA}/v1/paymentWidgets.js?checkoutId=${checkoutId}`;
     s.async = true;
+    s.onerror = () => log("Error cargando widget", "err");
     s.onload = () => {
       log("Widget cargado ✓", "ok");
       log(
-        `Tipo de pago: ${isSubscription ? "Suscripción (con tokenización)" : "Pago único"}`,
+        `Tipo de pago: ${isSubscription ? "Suscripción" : "Pago único"}`,
         "ok"
       );
-
-      // Configuración específica para suscripciones según documentación
-      if (isSubscription) {
-        // Configuración para modalidad "En el momento de la transacción"
-        window.wpwlOptions = window.wpwlOptions || {};
-        window.wpwlOptions.onReady = function () {
-          // Agregar checkbox para guardar tarjeta según documentación
-          var createRegistrationHtml =
-            '<div class="customLabel">¿Desea guardar de manera segura sus datos?</div>' +
-            '<div class="customInput"><input type="checkbox" name="createRegistration" checked/></div>';
-          const cardForm = document.querySelector("form.wpwl-form-card");
-          const button = cardForm?.querySelector(".wpwl-button");
-          if (button) {
-            button.insertAdjacentHTML("beforebegin", createRegistrationHtml);
-          }
-
-          // Agregar logo de Datafast según documentación
-          var datafast =
-            '<br/><img src="https://www.datafast.com.ec/images/verified.png" style="display:block;margin:0 auto; width:100%;">';
-          if (button) {
-            button.insertAdjacentHTML("beforebegin", datafast);
-          }
-
-          log("✅ Checkbox de tokenización agregado según documentación", "ok");
-        };
-
-        window.wpwlOptions.style = "card";
-        window.wpwlOptions.locale = "es";
-        window.wpwlOptions.labels = {
-          cvv: "Código de verificación",
-          cardHolder: "Nombre (Igual que en la tarjeta)",
-        };
-        window.wpwlOptions.registrations = {
-          requireCvv: true,
-          hideInitialPaymentForms: false,
-        };
-
-        log(
-          "Configuración de tokenización aplicada (modalidad 'En el momento de la transacción')",
-          "ok"
-        );
-      }
-
       log(`✅ Widget configurado para redirigir a: ${callbackUrl}`, "ok");
     };
-    s.onerror = () => log("Error cargando widget", "err");
     document.body.appendChild(s);
   }
 

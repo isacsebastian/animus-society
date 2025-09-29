@@ -1,0 +1,207 @@
+{
+"subscription": {
+"id": "cmg478i1m0005txe0h5y60wad",
+"customerId": "cmg46sxv50000txhgn5l2ipri",
+"tokenId": "cmg478hoz0003txe0ug8m9svc",
+"planType": "TEST_MONTHLY",
+"status": "ACTIVE",
+"amount": "1",
+"currency": "USD",
+"nextBillingDate": "2025-10-28T21:15:46.130Z",
+"lastBillingDate": "2025-09-28T21:15:46.137Z",
+"failedAttempts": 0,
+"maxRetries": 3,
+"createdAt": "2025-09-28T21:15:46.138Z",
+"updatedAt": "2025-09-28T21:15:46.138Z",
+"customer": {
+"id": "cmg46sxv50000txhgn5l2ipri",
+"merchantCustomerId": "0987654321",
+"email": "isaacnoemi@gmail.com",
+"givenName": "Isaac",
+"middleName": "Noemi",
+"surname": "Forever",
+"createdAt": "2025-09-28T21:03:40.138Z",
+"updatedAt": "2025-09-28T21:03:40.138Z"
+},
+"token": {
+"id": "cmg478hoz0003txe0ug8m9svc",
+"customerId": "cmg46sxv50000txhgn5l2ipri",
+"token": "8ac7a4a19985c1fc0199922e02954dcb",
+"brand": "VISA",
+"last4": "0000",
+"expiryMonth": 7,
+"expiryYear": 2026,
+"isActive": true,
+"createdAt": "2025-09-28T21:15:45.680Z",
+"updatedAt": "2025-09-28T21:15:45.680Z"
+},
+"payments": [
+{
+"id": "cmg46t1t60002txhgc72uy5hq",
+"customerId": "cmg46sxv50000txhgn5l2ipri",
+"subscriptionId": "cmg478i1m0005txe0h5y60wad",
+"tokenId": "cmg478hoz0003txe0ug8m9svc",
+"paymentType": "INITIAL",
+"merchantTransactionId": "ORD_MG46R00A_VEJAMPZ7",
+"amount": "1",
+"currency": "USD",
+"base0": "0",
+"baseImp": "0.89",
+"iva": "0.11",
+"gatewayResponse": {
+"id": "8ac7a4a29985c77a0199922e03ee36be",
+"ndc": "693CDE8DD22ECF7B2816E91A531FF820.uat01-vm-tx02",
+"card": {
+"bin": "420000",
+"holder": "ANIMUSSOCIETY",
+"binCountry": "US",
+"expiryYear": "2026",
+"expiryMonth": "07",
+"last4Digits": "0000"
+},
+"risk": {
+"score": "100",
+"parameters": {
+"USER_DATA2": "ANIMUSSOCIETY"
+}
+},
+"amount": "1.00",
+"result": {
+"code": "000.100.112",
+"description": "Request successfully processed in 'Merchant in Connector Test Mode'"
+},
+"currency": "USD",
+"customer": {
+"ip": "::1",
+"email": "isaacnoemi@gmail.com",
+"surname": "Forever",
+"givenName": "Isaac",
+"middleName": "Noemi",
+"merchantCustomerId": "0987654321"
+},
+"timestamp": "2025-09-28 21:15:14+0000",
+"descriptor": "4990.6976.2758 ANIMUSSOCIETY",
+"buildNumber": "32783031a41235eb835b233aa166038148b2417a@2025-09-26 00:42:32 +0000",
+"paymentType": "DB",
+"paymentBrand": "VISA",
+"recurringType": "INITIAL",
+"resultDetails": {
+"BatchNo": "250928",
+"AuthCode": "002370",
+"CardType": "MP",
+"Response": "00",
+"ReferenceNo": "000036",
+"TotalAmount": "1.00",
+"AcquirerCode": "01",
+"ReferenceNbr": "250928_000036",
+"ConnectorTxID1": "8ac7a4a29985c77a0199922e03ee36be",
+"AcquirerResponse": "00_01MP",
+"AcquirerTimestamp": "2025-09-28 21:12:22",
+"ExtendedDescription": "Transaccion aprobada",
+"clearingInstituteName": "Datafast"
+},
+"registrationId": "8ac7a4a19985c1fc0199922e02954dcb",
+"customParameters": {
+"SHOPPER_ECI": "0103910",
+"SHOPPER_MID": "1000000505",
+"SHOPPER_TID": "PD100406",
+"SHOPPER_PSERV": "17913101",
+"SHOPPER_VAL_IVA": "0.11",
+"SHOPPER_VAL_BASE0": "0.00",
+"SHOPPER_VERSIONDF": "2",
+"SHOPPER_VAL_BASEIMP": "0.89",
+"CTPE_DESCRIPTOR_TEMPLATE": "",
+"SHOPPER_EndToEndIdentity": "4d1a10584ec71209a247836b3995bbd6b322ffda864e2a7778193aaf462cf901"
+},
+"merchantTransactionId": "ORD_MG46R00A_VEJAMPZ7"
+},
+"resultCode": "000.100.112",
+"resultDescription": "Request successfully processed in 'Merchant in Connector Test Mode'",
+"resourcePath": null,
+"status": "APPROVED",
+"createdAt": "2025-09-28T21:03:45.255Z",
+"updatedAt": "2025-09-28T21:15:46.364Z"
+}
+]
+},
+"paymentToken": {
+"id": "cmg478hoz0003txe0ug8m9svc",
+"customerId": "cmg46sxv50000txhgn5l2ipri",
+"token": "8ac7a4a19985c1fc0199922e02954dcb",
+"brand": "VISA",
+"last4": "0000",
+"expiryMonth": 7,
+"expiryYear": 2026,
+"isActive": true,
+"createdAt": "2025-09-28T21:15:45.680Z",
+"updatedAt": "2025-09-28T21:15:45.680Z"
+},
+"paymentResult": {
+"id": "8ac7a4a29985c77a0199922e03ee36be",
+"registrationId": "8ac7a4a19985c1fc0199922e02954dcb",
+"paymentType": "DB",
+"paymentBrand": "VISA",
+"amount": "1.00",
+"currency": "USD",
+"descriptor": "4990.6976.2758 ANIMUSSOCIETY",
+"merchantTransactionId": "ORD_MG46R00A_VEJAMPZ7",
+"recurringType": "INITIAL",
+"result": {
+"code": "000.100.112",
+"description": "Request successfully processed in 'Merchant in Connector Test Mode'"
+},
+"resultDetails": {
+"AuthCode": "002370",
+"ConnectorTxID1": "8ac7a4a29985c77a0199922e03ee36be",
+"ReferenceNbr": "250928_000036",
+"BatchNo": "250928",
+"TotalAmount": "1.00",
+"Response": "00",
+"ExtendedDescription": "Transaccion aprobada",
+"clearingInstituteName": "Datafast",
+"CardType": "MP",
+"AcquirerCode": "01",
+"AcquirerResponse": "00_01MP",
+"ReferenceNo": "000036",
+"AcquirerTimestamp": "2025-09-28 21:12:22"
+},
+"card": {
+"bin": "420000",
+"binCountry": "US",
+"last4Digits": "0000",
+"holder": "ANIMUSSOCIETY",
+"expiryMonth": "07",
+"expiryYear": "2026"
+},
+"customer": {
+"givenName": "Isaac",
+"surname": "Forever",
+"middleName": "Noemi",
+"merchantCustomerId": "0987654321",
+"email": "isaacnoemi@gmail.com",
+"ip": "::1"
+},
+"customParameters": {
+"SHOPPER_VAL_BASEIMP": "0.89",
+"SHOPPER_EndToEndIdentity": "4d1a10584ec71209a247836b3995bbd6b322ffda864e2a7778193aaf462cf901",
+"CTPE_DESCRIPTOR_TEMPLATE": "",
+"SHOPPER_ECI": "0103910",
+"SHOPPER_MID": "1000000505",
+"SHOPPER_PSERV": "17913101",
+"SHOPPER_VAL_IVA": "0.11",
+"SHOPPER_VAL_BASE0": "0.00",
+"SHOPPER_TID": "PD100406",
+"SHOPPER_VERSIONDF": "2"
+},
+"risk": {
+"score": "100",
+"parameters": {
+"USER_DATA2": "ANIMUSSOCIETY"
+}
+},
+"buildNumber": "32783031a41235eb835b233aa166038148b2417a@2025-09-26 00:42:32 +0000",
+"timestamp": "2025-09-28 21:15:14+0000",
+"ndc": "693CDE8DD22ECF7B2816E91A531FF820.uat01-vm-tx02"
+},
+"customerId": "cmg46sxv50000txhgn5l2ipri"
+}
