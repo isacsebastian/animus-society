@@ -1,0 +1,64 @@
+{
+"id": "8ac7a4a1999acab901999b207a4f26fa",
+"paymentType": "DB",
+"paymentBrand": "VISA",
+"amount": "1.00",
+"currency": "USD",
+"descriptor": "8273.6325.9846 ANIMUSSOCIETY",
+"merchantTransactionId": "ORD_MG6OJUS4_NSXNBFHK",
+"result": {
+"code": "000.100.112",
+"description": "Request successfully processed in 'Merchant in Connector Test Mode'"
+},
+"resultDetails": {
+"AuthCode": "700188",
+"ConnectorTxID1": "8ac7a4a1999acab901999b207a4f26fa",
+"ReferenceNbr": "250930_000010",
+"BatchNo": "250930",
+"TotalAmount": "1.00",
+"Response": "00",
+"ExtendedDescription": "Transaccion aprobada",
+"clearingInstituteName": "Datafast",
+"CardType": "MP",
+"AcquirerCode": "01",
+"AcquirerResponse": "00_01MP",
+"ReferenceNo": "000010",
+"AcquirerTimestamp": "2025-09-30 14:54:08"
+},
+"card": {
+"bin": "420000",
+"binCountry": "US",
+"last4Digits": "0000",
+"holder": "ANIMUSSOCIETY",
+"expiryMonth": "07",
+"expiryYear": "2026"
+},
+"customer": {
+"givenName": "Juan",
+"surname": "Perez",
+"middleName": "Pablo",
+"merchantCustomerId": "0123456789",
+"ip": "::1"
+},
+"customParameters": {
+"SHOPPER_VAL_BASEIMP": "0.87",
+"SHOPPER_EndToEndIdentity": "edd81f01ec48dde0a14673cccee4fe8f95c27f8e42909011358a6ee284b1ce53",
+"CTPE_DESCRIPTOR_TEMPLATE": "",
+"SHOPPER_ECI": "0103910",
+"SHOPPER_MID": "1000000505",
+"SHOPPER_PSERV": "17913101",
+"SHOPPER_VAL_IVA": "0.13",
+"SHOPPER_VAL_BASE0": "0.00",
+"SHOPPER_TID": "PD100406",
+"SHOPPER_VERSIONDF": "2"
+},
+"risk": {
+"score": "100",
+"parameters": {
+"USER_DATA2": "ANIMUSSOCIETY"
+}
+},
+"buildNumber": "42fbfa7b43a5c5281d24858cbfc4dde756582f7a@2025-09-30 09:08:46 +0000",
+"timestamp": "2025-09-30 14:57:01+0000",
+"ndc": "43B0CB5BCD78775B068751AB5BFFB500.uat01-vm-tx03"
+}
