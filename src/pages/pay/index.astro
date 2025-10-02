@@ -929,6 +929,62 @@ const genId = () => {
             data-shopper-result-url="${callbackUrl}">
       </form>`;
 
+    // Agregar manejadores de eventos para interceptar la respuesta
+    const handleResponse = async function (event) {
+      try {
+        // Si recibimos un mensaje directo con redirectUrl
+        if (event.data?.redirectUrl) {
+          window.location.href = event.data.redirectUrl;
+          return;
+        }
+
+        // Si recibimos la respuesta como JSON en el cuerpo
+        if (typeof event.data === "string") {
+          try {
+            const data = JSON.parse(event.data);
+            if (data.redirectUrl) {
+              window.location.href = data.redirectUrl;
+              return;
+            }
+          } catch (e) {
+            console.log("No es una respuesta JSON válida");
+          }
+        }
+
+        // Si la respuesta viene como una URL con el parámetro payment
+        if (event.data?.url) {
+          const url = new URL(event.data.url);
+          if (url.searchParams.has("payment")) {
+            window.location.href = event.data.url;
+            return;
+          }
+        }
+      } catch (error) {
+        console.error("Error procesando respuesta:", error);
+      }
+    };
+
+    window.addEventListener("message", handleResponse, false);
+
+    // También escuchar por cambios en la URL (por si el widget hace una redirección directa)
+    const handleUrlChange = function () {
+      const url = new URL(window.location.href);
+      const payment = url.searchParams.get("payment");
+      if (payment) {
+        try {
+          const data = JSON.parse(decodeURIComponent(payment));
+          window.location.href =
+            "/payment-success?payment=" +
+            encodeURIComponent(JSON.stringify(data));
+        } catch (e) {
+          console.error("Error procesando datos del pago:", e);
+        }
+      }
+    };
+
+    window.addEventListener("popstate", handleUrlChange);
+    window.addEventListener("hashchange", handleUrlChange);
+
     window.wpwlOptions = {
       style: "card",
       locale: "es",

@@ -1,0 +1,374 @@
+---
+export const prerender = false; // <- MUY IMPORTANTE: fuerza SSR, los query llegan al server
+
+import Layout from "../layouts/Layout.astro";
+
+type Json = Record<string, any>;
+
+interface PaymentData {
+  id: string;
+  paymentType: string;
+  paymentBrand: string;
+  amount: string;
+  currency: string;
+  merchantTransactionId: string;
+  timestamp: string;
+  result?: {
+    code?: string;
+    description?: string;
+  };
+  resultDetails?: {
+    AuthCode?: string;
+    ReferenceNbr?: string;
+    [key: string]: any;
+  };
+  card?: {
+    last4Digits?: string;
+    [key: string]: any;
+  };
+  customer?: {
+    givenName?: string;
+    middleName?: string;
+    surname?: string;
+    merchantCustomerId?: string;
+    [key: string]: any;
+  };
+  registrationId?: string;
+  subscriptionDetails?: any;
+  customParameters?: {
+    SHOPPER_SUBSCRIPTION?: string;
+    [key: string]: any;
+  };
+  [key: string]: any;
+}
+
+// -------------------- Helpers robustos --------------------
+const tryParse = (raw: string | null): Json | null => {
+  if (!raw) return null;
+  // 1) Intento directo
+  try {
+    return JSON.parse(raw);
+  } catch {}
+  // 2) Intento decodeURIComponent + parse
+  try {
+    return JSON.parse(decodeURIComponent(raw));
+  } catch {}
+  // 3) Intento base64 (algunos gateways envían base64 del JSON)
+  try {
+    const txt = Buffer.from(raw, "base64").toString("utf8");
+    return JSON.parse(txt);
+  } catch {}
+  // 4) Intento decodeURIComponent + base64
+  try {
+    const dec = decodeURIComponent(raw);
+    const txt = Buffer.from(dec, "base64").toString("utf8");
+    return JSON.parse(txt);
+  } catch {}
+  return null;
+};
+
+const extractFromHash = (u: URL): string | null => {
+  // #payment=... ó #/...?... casos raros
+  const hash = u.hash || "";
+  if (!hash) return null;
+  // #payment=JSON
+  if (hash.startsWith("#payment=")) return hash.slice("#payment=".length);
+  // #/path?payment=...
+  const qIndex = hash.indexOf("payment=");
+  if (qIndex >= 0) {
+    const sub = hash.slice(qIndex + "payment=".length);
+    const amp = sub.indexOf("&");
+    return amp >= 0 ? sub.slice(0, amp) : sub;
+  }
+  return null;
+};
+
+// -------------------- Lectura SSR --------------------
+const reqUrl = Astro.url; // SSR URL
+const paymentParam =
+  reqUrl.searchParams.get("payment") ??
+  extractFromHash(reqUrl) ?? // por si te llega en hash (algunos proxies lo preservan)
+  null;
+
+let payment: string | null = paymentParam;
+let rawData: string | null = paymentParam;
+let orderData: PaymentData | null = null;
+let parseError: string | undefined = undefined;
+
+try {
+  const parsed = tryParse(paymentParam);
+  if (parsed) {
+    orderData = parsed as PaymentData;
+  } else {
+    parseError = paymentParam
+      ? "No se pudo parsear 'payment' (probé JSON, decodeURIComponent y base64)."
+      : undefined;
+  }
+} catch (e) {
+  parseError = e instanceof Error ? e.message : String(e);
+}
+
+// Determinar el estado del pago
+
+// Éxito más flexible: muchos resultados exitosos empiezan con "000."
+const isSuccess = !!(
+  orderData?.result?.code && orderData.result.code.startsWith("000.")
+);
+const isSubscription = Boolean(
+  orderData?.registrationId ||
+    orderData?.subscriptionDetails ||
+    orderData?.customParameters?.SHOPPER_SUBSCRIPTION === "true"
+);
+---
+
+<Layout
+  title={`${isSuccess ? "Orden Confirmada" : "Estado de Pago"} - Animus Society`}
+  description={isSuccess
+    ? "Tu pago ha sido procesado"
+    : "Estado del intento de pago"}
+>
+  <!--
+    Fallback client-side: si por política CORS/redirect el server no recibió ?payment,
+    intentamos rescatarlo en el cliente desde:
+    1) search ?payment=
+    2) hash #payment=
+    3) sessionStorage.lastPayment
+    y forzamos una recarga con ?payment= para que el SSR lo vea.
+  -->
+  <script>
+    // Script para verificar los parámetros del lado del cliente
+    document.addEventListener("DOMContentLoaded", () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const payment = urlParams.get("payment");
+
+      if (payment) {
+        // Guardar el payment en sessionStorage por si se necesita
+        sessionStorage.setItem("lastPayment", payment ?? "");
+
+        if (!window.location.href.includes("?payment=")) {
+          const newUrl = `${window.location.pathname}?payment=${encodeURIComponent(payment)}`;
+          window.location.href = newUrl;
+        }
+      } else if (sessionStorage.getItem("lastPayment")) {
+        const savedPayment = sessionStorage.getItem("lastPayment");
+        const newUrl = `${window.location.pathname}?payment=${encodeURIComponent(savedPayment ?? "")}`;
+        sessionStorage.removeItem("lastPayment");
+        window.location.href = newUrl;
+      }
+    });
+  </script>
+  <style is:global>
+    html,
+    body {
+      overflow: auto !important;
+      height: auto !important;
+    }
+    .error-text {
+      color: #ef4444;
+    }
+  </style>
+
+  <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-4xl mx-auto mb-4">
+      <a
+        href="/"
+        class="inline-flex items-center justify-center w-10 h-10 text-gray-600 hover:text-gray-900 hover:bg-white rounded-full transition-all duration-200 shadow-sm border border-gray-200"
+      >
+        <svg
+          class="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+      </a>
+    </div>
+
+    <div class="max-w-4xl mx-auto">
+      {
+        !orderData ? (
+          <div class="text-center">
+            <h1 class="text-2xl font-semibold text-gray-900 mb-4">
+              No se encontró información del pago
+            </h1>
+            <p class="text-gray-600">
+              Por favor, contacta a soporte si crees que esto es un error.
+            </p>
+          </div>
+        ) : (
+          <>
+            <div class="text-center mb-8">
+              <div
+                class={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 ${
+                  isSuccess ? "bg-green-100" : "bg-red-100"
+                }`}
+              >
+                {isSuccess ? (
+                  <svg
+                    class="w-8 h-8 text-green-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                ) : (
+                  <svg
+                    class="w-8 h-8 text-red-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                )}
+              </div>
+              <h1 class="text-2xl font-semibold text-gray-900 mb-2">
+                {isSuccess
+                  ? isSubscription
+                    ? "¡Suscripción Activada!"
+                    : "¡Pago Confirmado!"
+                  : "Error en el Pago"}
+              </h1>
+              <p class="text-gray-600">
+                {isSuccess
+                  ? `Tu ${
+                      isSubscription ? "suscripción" : "pago"
+                    } ha sido procesado exitosamente`
+                  : orderData?.result?.description ||
+                    "Error procesando el pago"}
+              </p>
+            </div>
+
+            <div class="bg-white shadow rounded-lg overflow-hidden">
+              <div class="border-b border-gray-200 px-6 py-4">
+                <h2 class="text-lg font-medium text-gray-900">
+                  Detalles de la Transacción
+                </h2>
+              </div>
+
+              <div class="px-6 py-4 space-y-6">
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                  <div>
+                    <h3 class="text-sm font-medium text-gray-500">
+                      ID de Transacción
+                    </h3>
+                    <p class="mt-1 text-sm text-gray-900">
+                      {orderData.merchantTransactionId}
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3 class="text-sm font-medium text-gray-500">Monto</h3>
+                    <p class="mt-1 text-sm text-gray-900">
+                      ${orderData.amount} {orderData.currency}
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3 class="text-sm font-medium text-gray-500">
+                      Método de Pago
+                    </h3>
+                    <p class="mt-1 text-sm text-gray-900">
+                      {orderData?.paymentBrand} (****{" "}
+                      {orderData?.card?.last4Digits})
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3 class="text-sm font-medium text-gray-500">Fecha</h3>
+                    <p class="mt-1 text-sm text-gray-900">
+                      {new Date(orderData.timestamp).toLocaleString()}
+                    </p>
+                  </div>
+
+                  {orderData.resultDetails && (
+                    <>
+                      <div>
+                        <h3 class="text-sm font-medium text-gray-500">
+                          Código de Autorización
+                        </h3>
+                        <p class="mt-1 text-sm text-gray-900">
+                          {orderData.resultDetails.AuthCode}
+                        </p>
+                      </div>
+
+                      <div>
+                        <h3 class="text-sm font-medium text-gray-500">
+                          Número de Referencia
+                        </h3>
+                        <p class="mt-1 text-sm text-gray-900">
+                          {orderData.resultDetails.ReferenceNbr}
+                        </p>
+                      </div>
+                    </>
+                  )}
+                </div>
+
+                {orderData.customer && (
+                  <div>
+                    <h3 class="text-sm font-medium text-gray-500 mb-2">
+                      Información del Cliente
+                    </h3>
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <p class="text-sm text-gray-900">
+                        <span class="font-medium">Nombre:</span>{" "}
+                        {`${orderData.customer.givenName} ${
+                          orderData.customer.middleName || ""
+                        } ${orderData.customer.surname}`}
+                      </p>
+                      {orderData.customer.merchantCustomerId && (
+                        <p class="text-sm text-gray-900">
+                          <span class="font-medium">ID de Cliente:</span>{" "}
+                          {orderData.customer.merchantCustomerId}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {isSubscription && (
+                  <div>
+                    <h3 class="text-sm font-medium text-gray-500 mb-2">
+                      Detalles de la Suscripción
+                    </h3>
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <p class="text-sm text-gray-900">
+                        <span class="font-medium">ID de Registro:</span>{" "}
+                        {orderData.registrationId}
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div class="mt-8 text-center">
+              <a
+                href="/"
+                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+              >
+                Volver al Inicio
+              </a>
+            </div>
+          </>
+        )
+      }
+    </div>
+  </div>
+</Layout>
