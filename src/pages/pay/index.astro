@@ -18,11 +18,7 @@ const genId = () => {
   description="Completa tu compra en Animus Society de forma segura y rápida"
 >
   <Notification />
-
-  <!-- CSS GLOBAL para el widget (no scoping de Astro) -->
-  <!-- CSS GLOBAL para el widget (no scoping de Astro) -->
   <style is:global id="wpwl-custom">
-    /* Tipografía y tamaño base coherentes con tu form (text-sm, sin negrita) */
     #widget-mount .wpwl-container {
       font-family: inherit !important;
       font-size: 0.875rem !important;
@@ -30,7 +26,6 @@ const genId = () => {
       font-weight: 400 !important;
     }
 
-    /* Contenedor y labels */
     #widget-mount .wpwl-container.wpwl-container-card {
       border: 1px solid #e5e7eb !important;
       background: #fff !important;
@@ -42,8 +37,6 @@ const genId = () => {
       color: #374151 !important;
       margin-bottom: 6px !important;
     }
-
-    /* Inputs controlables (expiry, cardHolder, brand) */
     #widget-mount .wpwl-control-expiry,
     #widget-mount .wpwl-control-cardHolder,
     #widget-mount .wpwl-control-brand {
@@ -58,7 +51,6 @@ const genId = () => {
       height: 42px !important;
     }
 
-    /* Wrapper de iframes */
     #widget-mount .wpwl-wrapper-cardNumber,
     #widget-mount .wpwl-wrapper-cvv {
       background: #fff !important;
@@ -68,7 +60,6 @@ const genId = () => {
       isolation: isolate !important;
     }
 
-    /* REGLAS ESPECÍFICAS PARA LOS IFRAMES (patch funcional) */
     #widget-mount iframe[name="card.number"],
     #widget-mount iframe[name="card.cvv"] {
       display: block !important;
@@ -78,22 +69,16 @@ const genId = () => {
       border: 1px solid #d1d5db !important;
       background: #fff !important;
       box-sizing: border-box !important;
-
-      /* Forzar tipografía si el navegador lo respeta + fallback visual */
       color: #111827 !important;
       font-family: inherit !important;
       font-size: 0.875rem !important;
       font-weight: 400 !important;
-
-      /* Fallbacks visuales para oscurecer el contenido del iframe */
       filter: contrast(1.55) brightness(0.92) saturate(1.12) !important;
       mix-blend-mode: multiply !important;
       backface-visibility: hidden !important;
       transform: translateZ(0) !important;
       isolation: isolate !important;
     }
-
-    /* foco más fuerte */
     #widget-mount
       .wpwl-wrapper-cardNumber:focus-within
       iframe[name="card.number"],
@@ -229,7 +214,6 @@ const genId = () => {
               />
             </div>
 
-            <!-- Email -->
             <div>
               <label
                 for="email"
@@ -249,7 +233,6 @@ const genId = () => {
               />
             </div>
 
-            <!-- ID Cliente -->
             <div>
               <label
                 for="merchantCustomerId"
@@ -271,13 +254,10 @@ const genId = () => {
               />
             </div>
 
-            <!-- Selección de Plan -->
             <div class="border-t border-gray-200 pt-6">
               <h3 class="text-lg font-medium text-gray-900 mb-4">
                 Selecciona tu Plan
               </h3>
-
-              <!-- Tabs para tipo de plan -->
               <div class="mb-6">
                 <div class="flex bg-gray-100 rounded-lg p-1">
                   <button
@@ -304,7 +284,6 @@ const genId = () => {
                 </div>
               </div>
 
-              <!-- Planes Gimnasio -->
               <div id="plans-gym" class="plan-section">
                 <div class="grid gap-4">
                   <label class="plan-option cursor-pointer">
@@ -367,7 +346,6 @@ const genId = () => {
                 </div>
               </div>
 
-              <!-- Planes App -->
               <div id="plans-app" class="plan-section hidden">
                 <div class="grid gap-4">
                   <label class="plan-option cursor-pointer">
@@ -435,7 +413,6 @@ const genId = () => {
                 </div>
               </div>
 
-              <!-- Planes de Prueba -->
               <div id="plans-test" class="plan-section hidden">
                 <div class="grid gap-4">
                   <label class="plan-option cursor-pointer">
@@ -497,10 +474,7 @@ const genId = () => {
               </div>
 
               <div class="space-y-4 mt-6">
-                <!-- Monto (oculto, se actualiza automáticamente) -->
                 <input type="hidden" id="amount" name="amount" value="77.00" />
-
-                <!-- ID de Transacción -->
                 <div>
                   <label
                     for="merchantTransactionId"
@@ -519,7 +493,6 @@ const genId = () => {
                   />
                 </div>
 
-                <!-- Desglose de Impuestos (calculados automáticamente) -->
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div>
                     <label
@@ -933,7 +906,6 @@ const genId = () => {
     return await res.json();
   }
 
-  // === Carga del widget con guard anti-duplicados ===
   function loadWidget(
     checkoutId,
     isSubscription = false,
@@ -947,21 +919,16 @@ const genId = () => {
         ? `${BACKEND}/api/payments/json-response?type=subscription&customerId=${subscriptionData.customerId}&planType=${subscriptionData.planType}`
         : `${BACKEND}/api/payments/json-response?type=onetime`;
 
-    // Limpia instancias previas del widget (contenedores/formularios)
     mount.innerHTML = "";
 
-    // Quita script previo si existiera
     const prevScript = document.getElementById("oppwa-script");
     if (prevScript) prevScript.remove();
-
-    // Monta el form base
     mount.innerHTML = `
       <form action="${callbackUrl}" class="paymentWidgets"
             data-brands="VISA MASTER AMEX DINERS DISCOVER"
             data-shopper-result-url="${callbackUrl}">
       </form>`;
 
-    // Opciones ANTES del script
     window.wpwlOptions = {
       style: "card",
       locale: "es",
@@ -975,8 +942,6 @@ const genId = () => {
           "#widget-mount form.wpwl-form-card"
         );
         const payBtn = form?.querySelector(".wpwl-button-pay");
-
-        // para suscripción: checkbox de guardar tarjeta
         if (isSubscription && form) {
           const submitBtn = form.querySelector(".wpwl-button-pay");
           const box = document.createElement("div");
@@ -992,7 +957,6 @@ const genId = () => {
           submitBtn?.parentNode?.insertBefore(box, submitBtn);
         }
 
-        // Trust mark Datafast (opcional)
         payBtn?.insertAdjacentHTML(
           "afterend",
           '<div style="text-align:center;margin-top:8px;"><img src="https://www.datafast.com.ec/images/verified.png" style="max-width:180px;opacity:.9;" alt="Datafast Secure"/></div>'
@@ -1007,8 +971,6 @@ const genId = () => {
         useTokenOnly: false,
       };
     }
-
-    // Carga UNA sola vez el script para este checkout
     const s = document.createElement("script");
     s.id = "oppwa-script";
     s.src = `${OPPWA}/v1/paymentWidgets.js?checkoutId=${checkoutId}`;
@@ -1085,7 +1047,7 @@ const genId = () => {
 
       try {
         if (isMonthlyPlan) {
-          log("🔄 Creando suscripción mensual...");
+          log("Creando suscripción mensual...");
 
           let planType;
           if (planValue === "test-monthly") {
