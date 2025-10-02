@@ -923,9 +923,10 @@ const genId = () => {
           box.style.marginBottom = "20px";
           box.innerHTML = `
             <div class="wpwl-checkbox-registration">
-              <label class="wpwl-label wpwl-label-registration" style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-                <input type="checkbox" class="wpwl-control wpwl-control-checkbox" value="true" checked>
-                <span style="font-size:14px;">Guardar información de tarjeta para pagos futuros</span>
+              <label class="wpwl-label wpwl-label-registration" style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px">
+                <input type="checkbox" class="wpwl-control wpwl-control-checkbox" value="true" checked
+                 style="width:16px; height:16px; margin:0; vertical-align:middle;">
+                <span>Guardar información de tarjeta para pagos futuros</span>
               </label>
             </div>`;
           submitBtn?.parentNode?.insertBefore(box, submitBtn);
