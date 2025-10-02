@@ -7,7 +7,9 @@ const BACKEND = import.meta.env.PUBLIC_BACKEND_URL || "http://localhost:3000";
 const OPPWA = import.meta.env.PUBLIC_OPPWA_URL || "https://eu-test.oppwa.com";
 
 const genId = () => {
-  return `ORD_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 10)}`.toUpperCase();
+  return `ORD_${Date.now().toString(36)}_${Math.random()
+    .toString(36)
+    .slice(2, 10)}`.toUpperCase();
 };
 ---
 
@@ -16,6 +18,125 @@ const genId = () => {
   description="Completa tu compra en Animus Society de forma segura y rápida"
 >
   <Notification />
+
+  <!-- CSS GLOBAL para el widget (no scoping de Astro) -->
+  <style is:global id="wpwl-custom">
+    /* Tipografía y tamaño base coherentes con tu form (text-sm, sin negrita) */
+    #widget-mount .wpwl-container {
+      font-family: inherit !important;
+      font-size: 0.875rem !important; /* text-sm */
+      line-height: 1.5 !important;
+      font-weight: 400 !important;     /* sin negrita */
+    }
+
+    /* Contenedor principal del form de tarjeta */
+    #widget-mount .wpwl-container.wpwl-container-card {
+      border: 1px solid #e5e7eb !important;  /* gray-200 */
+      border-radius: 12px !important;
+      padding: 16px !important;
+      background: #fff !important;
+    }
+
+    /* Labels (sin negrita, gray-700) */
+    #widget-mount .wpwl-label {
+      font-family: inherit !important;
+      font-size: 0.875rem !important;         /* text-sm */
+      font-weight: 400 !important;             /* sin negrita */
+      color: #374151 !important;               /* gray-700 */
+      margin-bottom: 6px !important;
+    }
+    #widget-mount .wpwl-group { margin-bottom: 14px !important; }
+
+    /* Select de marca */
+    #widget-mount .wpwl-control-brand {
+      font-family: inherit !important;
+      font-size: 0.875rem !important;
+      color: #111827 !important;               /* gray-900 */
+      border: 1px solid #d1d5db !important;    /* gray-300 */
+      border-radius: 10px !important;
+      padding: 10px 12px !important;
+      background: #fff !important;
+      outline: none !important;
+    }
+    #widget-mount .wpwl-control-brand:focus {
+      border-color: #111827 !important;
+      box-shadow: 0 0 0 2px rgba(17,24,39,0.10) !important;
+    }
+
+    /* Inputs SÍ controlables (no-iframe): expiry y cardHolder */
+    #widget-mount .wpwl-control-expiry,
+    #widget-mount .wpwl-control-cardHolder {
+      font-family: inherit !important;
+      font-size: 0.875rem !important;          /* text-sm */
+      color: #111827 !important;               /* gray-900 */
+      border: 1px solid #d1d5db !important;    /* gray-300 */
+      border-radius: 10px !important;
+      padding: 10px 12px !important;
+      background: #fff !important;
+      outline: none !important;
+      height: 42px !important;
+    }
+    #widget-mount .wpwl-control-expiry:focus,
+    #widget-mount .wpwl-control-cardHolder:focus {
+      border-color: #111827 !important;        /* gray-900 */
+      box-shadow: 0 0 0 2px rgba(17,24,39,0.10) !important;
+    }
+
+    /* === NÚMERO y CVV (iframes) ===
+       No se puede cambiar la tipografía/color internos por PCI.
+       Igualamos “look” (borde, radio, altura, foco) al resto. */
+    #widget-mount .wpwl-wrapper-cardNumber,
+    #widget-mount .wpwl-wrapper-cvv {
+      padding: 0 !important;
+      border: 0 !important;
+      background: #ffffff !important;
+    }
+    #widget-mount .wpwl-control-cardNumber,
+    #widget-mount .wpwl-control-cvv {
+      display: block !important;
+      width: 100% !important;
+      height: 42px !important;                 /* altura igual a tus inputs */
+      border: 1px solid #d1d5db !important;    /* gray-300 */
+      border-radius: 10px !important;
+      background: #ffffff !important;
+      outline: none !important;
+    }
+    #widget-mount .wpwl-control-cardNumber:focus,
+    #widget-mount .wpwl-control-cvv:focus {
+      border-color: #111827 !important;        /* gray-900 */
+      box-shadow: 0 0 0 2px rgba(17,24,39,0.10) !important;
+    }
+
+    /* Botón pagar — sin negrita, text-sm */
+    #widget-mount .wpwl-button,
+    #widget-mount .wpwl-button-pay {
+      font-family: inherit !important;
+      font-size: 0.875rem !important;          /* text-sm */
+      font-weight: 400 !important;             /* sin negrita */
+      background: #111827 !important;          /* “negro” Animus */
+      color: #ffffff !important;
+      border-radius: 10px !important;
+      padding: 12px 16px !important;
+      border: 1px solid #111827 !important;
+      transition: transform .06s ease, filter .06s ease !important;
+    }
+    #widget-mount .wpwl-button:hover,
+    #widget-mount .wpwl-button-pay:hover {
+      filter: brightness(1.05) !important;
+      transform: translateY(-1px) !important;
+    }
+
+    /* Hints / ayudas */
+    #widget-mount .wpwl-hint {
+      color: #6b7280 !important;               /* gray-500 */
+      font-size: 12px !important;
+    }
+
+    /* Si el widget añade adornos pseudo, los anulamos */
+    #widget-mount .wpwl-label::before,
+    #widget-mount .wpwl-label::after { content: none !important; }
+  </style>
+
   <style>
     html,
     body {
@@ -240,8 +361,7 @@ const genId = () => {
                         </p>
                       </div>
                       <div class="text-right">
-                        <span class="text-2xl font-bold text-gray-900">$77</span
-                        >
+                        <span class="text-2xl font-bold text-gray-900">$77</span>
                         <p class="text-sm text-gray-600">/mes</p>
                       </div>
                     </div>
@@ -270,9 +390,7 @@ const genId = () => {
                         <p class="text-sm text-gray-600">Plan anual completo</p>
                       </div>
                       <div class="text-right">
-                        <span class="text-2xl font-bold text-gray-900"
-                          >$799</span
-                        >
+                        <span class="text-2xl font-bold text-gray-900">$799</span>
                         <p class="text-sm text-gray-600">/año</p>
                       </div>
                     </div>
@@ -492,18 +610,14 @@ const genId = () => {
         </div>
 
         <!-- Resumen del Pedido -->
-        <div
-          class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 h-fit"
-        >
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 h-fit">
           <h2 class="text-xl font-semibold text-gray-900 mb-6">
             Estado de la Transacción
           </h2>
 
           <div class="space-y-4">
             <!-- Producto -->
-            <div
-              class="flex justify-between items-center py-3 border-b border-gray-200"
-            >
+            <div class="flex justify-between items-center py-3 border-b border-gray-200">
               <div>
                 <h3 id="summary-plan-name" class="font-medium text-gray-900">
                   Animus Flow - Plan Mensual
@@ -512,9 +626,7 @@ const genId = () => {
                   Plan mensual gimnasio
                 </p>
               </div>
-              <span id="summary-plan-price" class="font-semibold text-gray-900"
-                >$77.00</span
-              >
+              <span id="summary-plan-price" class="font-semibold text-gray-900">$77.00</span>
             </div>
 
             <!-- Subtotal -->
@@ -533,10 +645,7 @@ const genId = () => {
             <div class="border-t border-gray-200 pt-4">
               <div class="flex justify-between items-center">
                 <span class="text-lg font-semibold text-gray-900">Total</span>
-                <span
-                  id="summary-total"
-                  class="text-2xl font-bold text-gray-900">$86.24</span
-                >
+                <span id="summary-total" class="text-2xl font-bold text-gray-900">$86.24</span>
               </div>
             </div>
 
@@ -545,7 +654,7 @@ const genId = () => {
               type="button"
               class="w-full bg-gray-900 text-white py-3 px-4 rounded-md font-medium hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors mt-6"
             >
-              Crear checkout y pagar
+              Ir a pagar
             </button>
 
             <div class="text-center text-sm text-gray-500 mt-2">
@@ -555,49 +664,30 @@ const genId = () => {
             <div class="border-t border-gray-200 pt-6 mt-6">
               <div class="text-sm text-gray-600 mb-4">
                 Marcas habilitadas:
-                <span
-                  class="inline-block bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs mx-1"
-                  >VISA</span
-                >
-                <span
-                  class="inline-block bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs mx-1"
-                  >MASTER</span
-                >
-                <span
-                  class="inline-block bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs mx-1"
-                  >AMEX</span
-                >
-                <span
-                  class="inline-block bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs mx-1"
-                  >DINERS</span
-                >
-                <span
-                  class="inline-block bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs mx-1"
-                  >DISCOVER</span
-                >
+                <span class="inline-block bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs mx-1"
+                  >VISA</span>
+                <span class="inline-block bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs mx-1"
+                  >MASTER</span>
+                <span class="inline-block bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs mx-1"
+                  >AMEX</span>
+                <span class="inline-block bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs mx-1"
+                  >DINERS</span>
+                <span class="inline-block bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs mx-1"
+                  >DISCOVER</span>
               </div>
-              <div
-                id="widget-mount"
-                class="min-h-[200px] border border-gray-200 rounded-md p-4"
-              >
+              <div id="widget-mount" class="min-h-[200px] border border-gray-200 rounded-md p-4">
               </div>
             </div>
 
             <div class="mt-4 p-3 bg-gray-50 rounded-md">
               <div class="flex items-center">
-                <svg
-                  class="w-5 h-5 text-green-500 mr-2"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
+                <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
                   <path
                     fill-rule="evenodd"
                     d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
                     clip-rule="evenodd"></path>
                 </svg>
-                <span class="text-sm text-gray-600"
-                  >Pago 100% seguro y encriptado</span
-                >
+                <span class="text-sm text-gray-600">Pago 100% seguro y encriptado</span>
               </div>
             </div>
           </div>
@@ -634,26 +724,17 @@ const genId = () => {
 
   function updatePricing(price, planName, planDescription) {
     const calculation = calculateTax(price);
-
-    // Actualizar campos del formulario
     document.getElementById("amount").value = price.toFixed(2);
     document.getElementById("base0").value = "0.00";
     document.getElementById("baseImp").value = calculation.baseImp.toFixed(2);
     document.getElementById("iva").value = calculation.tax.toFixed(2);
 
-    // Actualizar resumen
     document.getElementById("summary-plan-name").textContent = planName;
-    document.getElementById("summary-plan-description").textContent =
-      planDescription;
-    document.getElementById("summary-plan-price").textContent =
-      `$${price.toFixed(2)}`;
-    // Subtotal sin IVA (base imponible)
-    document.getElementById("summary-subtotal").textContent =
-      `$${calculation.baseImp.toFixed(2)}`;
-    document.getElementById("summary-tax").textContent =
-      `$${calculation.tax.toFixed(2)}`;
-    document.getElementById("summary-total").textContent =
-      `$${calculation.total.toFixed(2)}`;
+    document.getElementById("summary-plan-description").textContent = planDescription;
+    document.getElementById("summary-plan-price").textContent = `$${price.toFixed(2)}`;
+    document.getElementById("summary-subtotal").textContent = `$${calculation.baseImp.toFixed(2)}`;
+    document.getElementById("summary-tax").textContent = `$${calculation.tax.toFixed(2)}`;
+    document.getElementById("summary-total").textContent = `$${calculation.total.toFixed(2)}`;
   }
 
   // Inicialización del DOM
@@ -666,31 +747,18 @@ const genId = () => {
       tab.addEventListener("click", function () {
         const targetSection = this.id.replace("tab-", "plans-");
 
-        // Actualizar tabs activos
         planTabs.forEach((t) => {
-          t.classList.remove(
-            "active",
-            "bg-white",
-            "text-gray-900",
-            "shadow-sm"
-          );
+          t.classList.remove("active", "bg-white", "text-gray-900", "shadow-sm");
           t.classList.add("text-gray-600", "hover:text-gray-900");
         });
 
         this.classList.add("active", "bg-white", "text-gray-900", "shadow-sm");
         this.classList.remove("text-gray-600", "hover:text-gray-900");
 
-        // Mostrar sección correspondiente
-        planSections.forEach((section) => {
-          section.classList.add("hidden");
-        });
-
+        planSections.forEach((section) => section.classList.add("hidden"));
         document.getElementById(targetSection).classList.remove("hidden");
 
-        // Seleccionar el primer plan de la nueva sección
-        const firstPlan = document.querySelector(
-          `#${targetSection} input[name="selectedPlan"]`
-        );
+        const firstPlan = document.querySelector(`#${targetSection} input[name="selectedPlan"]`);
         if (firstPlan) {
           firstPlan.checked = true;
           selectPlan(firstPlan);
@@ -706,7 +774,6 @@ const genId = () => {
       const planName = planInput.getAttribute("data-name");
       const planDescription = planInput.getAttribute("data-description");
 
-      // Actualizar estilos visuales
       document.querySelectorAll(".plan-option > div").forEach((div) => {
         div.classList.remove("border-gray-900", "bg-gray-50");
         div.classList.add("border-gray-200");
@@ -716,19 +783,15 @@ const genId = () => {
       selectedDiv.classList.add("border-gray-900", "bg-gray-50");
       selectedDiv.classList.remove("border-gray-200");
 
-      // Actualizar precios
       updatePricing(price, planName, planDescription);
     }
 
     planOptions.forEach((option) => {
       option.addEventListener("change", function () {
-        if (this.checked) {
-          selectPlan(this);
-        }
+        if (this.checked) selectPlan(this);
       });
     });
 
-    // Seleccionar el primer plan por defecto
     const defaultPlan = document.querySelector('input[name="selectedPlan"]');
     if (defaultPlan) {
       defaultPlan.checked = true;
@@ -749,11 +812,8 @@ const genId = () => {
     const surname = form.querySelector("#surname");
     const email = form.querySelector("#email");
     const merchantCustomerId = form.querySelector("#merchantCustomerId");
-    const selectedPlan = form.querySelector(
-      'input[name="selectedPlan"]:checked'
-    );
+    const selectedPlan = form.querySelector('input[name="selectedPlan"]:checked');
 
-    // Verificar campos requeridos
     const requiredFields = [
       { field: givenName, name: "Nombres" },
       { field: surname, name: "Apellidos" },
@@ -774,49 +834,34 @@ const genId = () => {
       return false;
     }
 
-    // Expresiones regulares
     const nameRegex = /^[A-Za-zÁáÉéÍíÓóÚúÑñ\s]+$/;
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     const idRegex = /^[0-9A-Za-z]+$/;
 
-    // Validar nombres (requerido)
     if (!nameRegex.test(givenName.value)) {
-      showNotification(
-        "El nombre solo debe contener letras y espacios",
-        "warning"
-      );
+      showNotification("El nombre solo debe contener letras y espacios", "warning");
       givenName.focus();
       return false;
     }
 
-    // Validar segundo nombre (opcional)
     if (middleName.value && !nameRegex.test(middleName.value)) {
-      showNotification(
-        "El segundo nombre solo debe contener letras y espacios",
-        "warning"
-      );
+      showNotification("El segundo nombre solo debe contener letras y espacios", "warning");
       middleName.focus();
       return false;
     }
 
-    // Validar apellidos (requerido)
     if (!nameRegex.test(surname.value)) {
-      showNotification(
-        "Los apellidos solo deben contener letras y espacios",
-        "warning"
-      );
+      showNotification("Los apellidos solo deben contener letras y espacios", "warning");
       surname.focus();
       return false;
     }
 
-    // Validar email
     if (!emailRegex.test(email.value)) {
       showNotification("Por favor ingrese un email válido", "warning");
       email.focus();
       return false;
     }
 
-    // Validar ID (cédula, DNI o pasaporte)
     if (!idRegex.test(merchantCustomerId.value)) {
       showNotification(
         "El número de identificación solo debe contener números y letras",
@@ -868,12 +913,8 @@ const genId = () => {
     return await res.json();
   }
 
-  // === Versión con checkbox para guardar tarjeta en suscripciones ===
-  function loadWidget(
-    checkoutId,
-    isSubscription = false,
-    subscriptionData = null
-  ) {
+  // === Carga del widget con guard anti-duplicados ===
+  function loadWidget(checkoutId, isSubscription = false, subscriptionData = null) {
     const mount = document.getElementById("widget-mount");
     if (!mount) return;
 
@@ -882,13 +923,21 @@ const genId = () => {
         ? `${BACKEND}/api/payments/json-response?type=subscription&customerId=${subscriptionData.customerId}&planType=${subscriptionData.planType}`
         : `${BACKEND}/api/payments/json-response?type=onetime`;
 
+    // Limpia instancias previas del widget (contenedores/formularios)
+    mount.innerHTML = "";
+
+    // Quita script previo si existiera
+    const prevScript = document.getElementById("oppwa-script");
+    if (prevScript) prevScript.remove();
+
+    // Monta el form base
     mount.innerHTML = `
       <form action="${callbackUrl}" class="paymentWidgets"
             data-brands="VISA MASTER AMEX DINERS DISCOVER"
             data-shopper-result-url="${callbackUrl}">
       </form>`;
 
-    // 1) Opciones ANTES del script
+    // Opciones ANTES del script
     window.wpwlOptions = {
       style: "card",
       locale: "es",
@@ -897,58 +946,50 @@ const genId = () => {
         cardHolder: "Nombre (Igual que en la tarjeta)",
         registerCard: "Guardar información de tarjeta para pagos futuros",
       },
-      
       onReady: function () {
-        const cardForm = document.querySelector("form.wpwl-form-card");
-        const button = cardForm?.querySelector(".wpwl-button");
+        const form = document.querySelector("#widget-mount form.wpwl-form-card");
+        const payBtn = form?.querySelector(".wpwl-button-pay");
 
-        // Para suscripciones, agregar checkbox de registro
-        if (isSubscription && cardForm) {
-          const submitButton = cardForm.querySelector(".wpwl-button-pay");
-          const registerContainer = document.createElement("div");
-          registerContainer.style.marginBottom = "20px";
-          registerContainer.innerHTML = `
+        // para suscripción: checkbox de guardar tarjeta
+        if (isSubscription && form) {
+          const submitBtn = form.querySelector(".wpwl-button-pay");
+          const box = document.createElement("div");
+          box.style.marginBottom = "20px";
+          box.innerHTML = `
             <div class="wpwl-checkbox-registration">
               <label class="wpwl-label wpwl-label-registration" style="display:flex;align-items:center;gap:8px;cursor:pointer;">
                 <input type="checkbox" class="wpwl-control wpwl-control-checkbox" value="true" checked>
                 <span style="font-size:14px;">Guardar información de tarjeta para pagos futuros</span>
               </label>
             </div>`;
-          submitButton?.parentNode.insertBefore(
-            registerContainer,
-            submitButton
-          );
+          submitBtn?.parentNode?.insertBefore(box, submitBtn);
         }
 
-        // Logo de Datafast
-        const trust =
-          '<div style="text-align:center;margin-top:8px;">' +
-          '  <img src="https://www.datafast.com.ec/images/verified.png" style="max-width:180px;opacity:.9;" alt="Datafast Secure"/>' +
-          "</div>";
-        button?.insertAdjacentHTML("afterend", trust);
+        // Trust mark Datafast (opcional)
+        payBtn?.insertAdjacentHTML(
+          "afterend",
+          '<div style="text-align:center;margin-top:8px;"><img src="https://www.datafast.com.ec/images/verified.png" style="max-width:180px;opacity:.9;" alt="Datafast Secure"/></div>'
+        );
       },
     };
 
     if (isSubscription) {
-      // Configuración para registro de tarjeta
       window.wpwlOptions.registrations = {
         requireCvv: true,
         hideInitialPaymentForms: false,
-        useTokenOnly: false, // Para permitir guardar la tarjeta
+        useTokenOnly: false,
       };
     }
 
-    // 2) Cargar script del widget
+    // Carga UNA sola vez el script para este checkout
     const s = document.createElement("script");
+    s.id = "oppwa-script";
     s.src = `${OPPWA}/v1/paymentWidgets.js?checkoutId=${checkoutId}`;
     s.async = true;
     s.onerror = () => log("Error cargando widget", "err");
     s.onload = () => {
       log("Widget cargado ✓", "ok");
-      log(
-        `Tipo de pago: ${isSubscription ? "Suscripción" : "Pago único"}`,
-        "ok"
-      );
+      log(`Tipo de pago: ${isSubscription ? "Suscripción" : "Pago único"}`, "ok");
       log(`✅ Widget configurado para redirigir a: ${callbackUrl}`, "ok");
     };
     document.body.appendChild(s);
@@ -957,10 +998,7 @@ const genId = () => {
   const btnCreate = document.getElementById("btn-create");
   if (btnCreate) {
     btnCreate.addEventListener("click", async () => {
-      // Validar el formulario antes de proceder
-      if (!validateForm()) {
-        return;
-      }
+      if (!validateForm()) return;
 
       log(`BACKEND URL: ${BACKEND}`);
       log(`OPPWA URL: ${OPPWA}`);
@@ -974,23 +1012,18 @@ const genId = () => {
       const fd = new FormData(payForm);
       const amount = String(fd.get("amount") || "1.00").trim();
 
-      // Verificar que se haya seleccionado un plan
-      const selectedPlan = document.querySelector(
-        'input[name="selectedPlan"]:checked'
-      );
+      const selectedPlan = document.querySelector('input[name="selectedPlan"]:checked');
       if (!selectedPlan) {
         alert("Por favor selecciona un plan");
         return;
       }
 
-      // Solo validar límite para planes que no sean de prueba (test)
       if (!selectedPlan.value.includes("test") && parseFloat(amount) > 50) {
         log("En sandbox, amount ≤ 50.00", "err");
         alert("En el ambiente de pruebas, el monto debe ser ≤ $50.00");
         return;
       }
 
-      // Determinar si es plan mensual (suscripción) o anual (pago único)
       const planValue = selectedPlan.value;
       const isMonthlyPlan = planValue.includes("monthly");
       const isGymPlan = planValue.includes("gym");
@@ -999,17 +1032,16 @@ const genId = () => {
       log(`Es plan mensual: ${isMonthlyPlan}`);
       log(`Es plan de gimnasio: ${isGymPlan}`);
 
-      // Procesar el segundo nombre (opcional)
       const middleNameValue = fd.get("middleName");
       const middleName =
-        middleNameValue && middleNameValue.trim().length >= 2
+        middleNameValue && String(middleNameValue).trim().length >= 2
           ? middleNameValue
           : null;
 
       const basePayload = {
         merchantTransactionId: String(fd.get("merchantTransactionId")),
         givenName: String(fd.get("givenName")),
-        middleName: middleName || undefined, // Enviar undefined si no hay valor válido
+        middleName: middleName || undefined,
         surname: String(fd.get("surname")),
         email: String(fd.get("email")),
         merchantCustomerId: String(fd.get("merchantCustomerId")),
@@ -1021,7 +1053,6 @@ const genId = () => {
 
       try {
         if (isMonthlyPlan) {
-          // FLUJO DE SUSCRIPCIÓN (planes mensuales)
           log("🔄 Creando suscripción mensual...");
 
           let planType;
@@ -1030,10 +1061,7 @@ const genId = () => {
           } else {
             planType = isGymPlan ? "GYM_MONTHLY" : "APP_MONTHLY";
           }
-          const subscriptionPayload = {
-            ...basePayload,
-            planType,
-          };
+          const subscriptionPayload = { ...basePayload, planType };
 
           log("Payload de suscripción:");
           log(subscriptionPayload);
@@ -1048,20 +1076,14 @@ const genId = () => {
 
           log(`CheckoutId recibido: ${data.id}`);
 
-          // Guardar datos de la suscripción para después del pago
           const subscriptionData = {
             customerId: data.customerId,
             planType: data.planType,
           };
 
-          sessionStorage.setItem(
-            "subscriptionData",
-            JSON.stringify(subscriptionData)
-          );
-
-          loadWidget(data.id, true, subscriptionData); // Pasar datos para la URL del callback
+          sessionStorage.setItem("subscriptionData", JSON.stringify(subscriptionData));
+          loadWidget(data.id, true, subscriptionData);
         } else {
-          // FLUJO DE PAGO ÚNICO (planes anuales y de prueba)
           log("💳 Creando pago único...");
 
           const oneTimePayload = {
