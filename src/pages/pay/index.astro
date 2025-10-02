@@ -21,85 +21,87 @@ const genId = () => {
 
   <!-- CSS GLOBAL para el widget (no scoping de Astro) -->
   <!-- CSS GLOBAL para el widget (no scoping de Astro) -->
-<style is:global id="wpwl-custom">
-  /* Tipografía y tamaño base coherentes con tu form (text-sm, sin negrita) */
-  #widget-mount .wpwl-container {
-    font-family: inherit !important;
-    font-size: 0.875rem !important;
-    line-height: 1.5 !important;
-    font-weight: 400 !important;
-  }
+  <style is:global id="wpwl-custom">
+    /* Tipografía y tamaño base coherentes con tu form (text-sm, sin negrita) */
+    #widget-mount .wpwl-container {
+      font-family: inherit !important;
+      font-size: 0.875rem !important;
+      line-height: 1.5 !important;
+      font-weight: 400 !important;
+    }
 
-  /* Contenedor y labels */
-  #widget-mount .wpwl-container.wpwl-container-card {
-    border: 1px solid #e5e7eb !important;
-    background: #fff !important;
-  }
-  #widget-mount .wpwl-label {
-    font-family: inherit !important;
-    font-size: 0.875rem !important;
-    font-weight: 400 !important;
-    color: #374151 !important;
-    margin-bottom: 6px !important;
-  }
+    /* Contenedor y labels */
+    #widget-mount .wpwl-container.wpwl-container-card {
+      border: 1px solid #e5e7eb !important;
+      background: #fff !important;
+    }
+    #widget-mount .wpwl-label {
+      font-family: inherit !important;
+      font-size: 0.875rem !important;
+      font-weight: 400 !important;
+      color: #374151 !important;
+      margin-bottom: 6px !important;
+    }
 
-  /* Inputs controlables (expiry, cardHolder, brand) */
-  #widget-mount .wpwl-control-expiry,
-  #widget-mount .wpwl-control-cardHolder,
-  #widget-mount .wpwl-control-brand {
-    font-family: inherit !important;
-    font-size: 0.875rem !important;
-    color: #111827 !important;
-    border: 1px solid #d1d5db !important;
-    border-radius: 10px !important;
-    padding: 10px 12px !important;
-    background: #fff !important;
-    outline: none !important;
-    height: 42px !important;
-  }
+    /* Inputs controlables (expiry, cardHolder, brand) */
+    #widget-mount .wpwl-control-expiry,
+    #widget-mount .wpwl-control-cardHolder,
+    #widget-mount .wpwl-control-brand {
+      font-family: inherit !important;
+      font-size: 0.875rem !important;
+      color: #111827 !important;
+      border: 1px solid #d1d5db !important;
+      border-radius: 10px !important;
+      padding: 10px 12px !important;
+      background: #fff !important;
+      outline: none !important;
+      height: 42px !important;
+    }
 
-  /* Wrapper de iframes */
-  #widget-mount .wpwl-wrapper-cardNumber,
-  #widget-mount .wpwl-wrapper-cvv {
-    background: #fff !important;
-    border-radius: 10px !important;
-    overflow: hidden !important;
-    position: relative !important;
-    isolation: isolate !important;
-  }
+    /* Wrapper de iframes */
+    #widget-mount .wpwl-wrapper-cardNumber,
+    #widget-mount .wpwl-wrapper-cvv {
+      background: #fff !important;
+      border-radius: 10px !important;
+      overflow: hidden !important;
+      position: relative !important;
+      isolation: isolate !important;
+    }
 
-  /* REGLAS ESPECÍFICAS PARA LOS IFRAMES (patch funcional) */
-  #widget-mount iframe[name="card.number"],
-  #widget-mount iframe[name="card.cvv"] {
-    display: block !important;
-    width: 100% !important;
-    height: 42px !important;
-    border-radius: 10px !important;
-    border: 1px solid #d1d5db !important;
-    background: #fff !important;
-    box-sizing: border-box !important;
+    /* REGLAS ESPECÍFICAS PARA LOS IFRAMES (patch funcional) */
+    #widget-mount iframe[name="card.number"],
+    #widget-mount iframe[name="card.cvv"] {
+      display: block !important;
+      width: 100% !important;
+      height: 42px !important;
+      border-radius: 10px !important;
+      border: 1px solid #d1d5db !important;
+      background: #fff !important;
+      box-sizing: border-box !important;
 
-    /* Forzar tipografía si el navegador lo respeta + fallback visual */
-    color: #111827 !important;
-    font-family: inherit !important;
-    font-size: 0.875rem !important;
-    font-weight: 400 !important;
+      /* Forzar tipografía si el navegador lo respeta + fallback visual */
+      color: #111827 !important;
+      font-family: inherit !important;
+      font-size: 0.875rem !important;
+      font-weight: 400 !important;
 
-    /* Fallbacks visuales para oscurecer el contenido del iframe */
-    filter: contrast(1.55) brightness(0.92) saturate(1.12) !important;
-    mix-blend-mode: multiply !important;
-    backface-visibility: hidden !important;
-    transform: translateZ(0) !important;
-    isolation: isolate !important;
-  }
+      /* Fallbacks visuales para oscurecer el contenido del iframe */
+      filter: contrast(1.55) brightness(0.92) saturate(1.12) !important;
+      mix-blend-mode: multiply !important;
+      backface-visibility: hidden !important;
+      transform: translateZ(0) !important;
+      isolation: isolate !important;
+    }
 
-  /* foco más fuerte */
-  #widget-mount .wpwl-wrapper-cardNumber:focus-within iframe[name="card.number"],
-  #widget-mount .wpwl-wrapper-cvv:focus-within iframe[name="card.cvv"] {
-    filter: contrast(1.8) brightness(0.90) saturate(1.15) !important;
-    mix-blend-mode: multiply !important;
-  }
-</style>
+    /* foco más fuerte */
+    #widget-mount
+      .wpwl-wrapper-cardNumber:focus-within
+      iframe[name="card.number"],
+    #widget-mount .wpwl-wrapper-cvv:focus-within iframe[name="card.cvv"] {
+      filter: contrast(1.8) brightness(0.9) saturate(1.15) !important;
+      mix-blend-mode: multiply !important;
+    }
+  </style>
 
   <style>
     html,
@@ -325,7 +327,8 @@ const genId = () => {
                         </p>
                       </div>
                       <div class="text-right">
-                        <span class="text-2xl font-bold text-gray-900">$77</span>
+                        <span class="text-2xl font-bold text-gray-900">$77</span
+                        >
                         <p class="text-sm text-gray-600">/mes</p>
                       </div>
                     </div>
@@ -354,7 +357,9 @@ const genId = () => {
                         <p class="text-sm text-gray-600">Plan anual completo</p>
                       </div>
                       <div class="text-right">
-                        <span class="text-2xl font-bold text-gray-900">$799</span>
+                        <span class="text-2xl font-bold text-gray-900"
+                          >$799</span
+                        >
                         <p class="text-sm text-gray-600">/año</p>
                       </div>
                     </div>
@@ -574,14 +579,18 @@ const genId = () => {
         </div>
 
         <!-- Resumen del Pedido -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 h-fit">
+        <div
+          class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 h-fit"
+        >
           <h2 class="text-xl font-semibold text-gray-900 mb-6">
             Estado de la Transacción
           </h2>
 
           <div class="space-y-4">
             <!-- Producto -->
-            <div class="flex justify-between items-center py-3 border-b border-gray-200">
+            <div
+              class="flex justify-between items-center py-3 border-b border-gray-200"
+            >
               <div>
                 <h3 id="summary-plan-name" class="font-medium text-gray-900">
                   Animus Flow - Plan Mensual
@@ -590,7 +599,9 @@ const genId = () => {
                   Plan mensual gimnasio
                 </p>
               </div>
-              <span id="summary-plan-price" class="font-semibold text-gray-900">$77.00</span>
+              <span id="summary-plan-price" class="font-semibold text-gray-900"
+                >$77.00</span
+              >
             </div>
 
             <!-- Subtotal -->
@@ -609,7 +620,10 @@ const genId = () => {
             <div class="border-t border-gray-200 pt-4">
               <div class="flex justify-between items-center">
                 <span class="text-lg font-semibold text-gray-900">Total</span>
-                <span id="summary-total" class="text-2xl font-bold text-gray-900">$86.24</span>
+                <span
+                  id="summary-total"
+                  class="text-2xl font-bold text-gray-900">$86.24</span
+                >
               </div>
             </div>
 
@@ -628,30 +642,49 @@ const genId = () => {
             <div class="border-t border-gray-200 pt-6 mt-6">
               <div class="text-sm text-gray-600 mb-4">
                 Marcas habilitadas:
-                <span class="inline-block bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs mx-1"
-                  >VISA</span>
-                <span class="inline-block bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs mx-1"
-                  >MASTER</span>
-                <span class="inline-block bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs mx-1"
-                  >AMEX</span>
-                <span class="inline-block bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs mx-1"
-                  >DINERS</span>
-                <span class="inline-block bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs mx-1"
-                  >DISCOVER</span>
+                <span
+                  class="inline-block bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs mx-1"
+                  >VISA</span
+                >
+                <span
+                  class="inline-block bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs mx-1"
+                  >MASTER</span
+                >
+                <span
+                  class="inline-block bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs mx-1"
+                  >AMEX</span
+                >
+                <span
+                  class="inline-block bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs mx-1"
+                  >DINERS</span
+                >
+                <span
+                  class="inline-block bg-gray-100 text-gray-800 px-2 py-1 rounded text-xs mx-1"
+                  >DISCOVER</span
+                >
               </div>
-              <div id="widget-mount" class="min-h-[200px] border border-gray-200 rounded-md">
+              <div
+                id="widget-mount"
+                class="min-h-[200px] border border-gray-200 rounded-md"
+              >
               </div>
             </div>
 
             <div class="mt-4 p-3 bg-gray-50 rounded-md">
               <div class="flex items-center">
-                <svg class="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <svg
+                  class="w-5 h-5 text-green-500 mr-2"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
                   <path
                     fill-rule="evenodd"
                     d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
                     clip-rule="evenodd"></path>
                 </svg>
-                <span class="text-sm text-gray-600">Pago 100% seguro y encriptado</span>
+                <span class="text-sm text-gray-600"
+                  >Pago 100% seguro y encriptado</span
+                >
               </div>
             </div>
           </div>
@@ -694,11 +727,16 @@ const genId = () => {
     document.getElementById("iva").value = calculation.tax.toFixed(2);
 
     document.getElementById("summary-plan-name").textContent = planName;
-    document.getElementById("summary-plan-description").textContent = planDescription;
-    document.getElementById("summary-plan-price").textContent = `$${price.toFixed(2)}`;
-    document.getElementById("summary-subtotal").textContent = `$${calculation.baseImp.toFixed(2)}`;
-    document.getElementById("summary-tax").textContent = `$${calculation.tax.toFixed(2)}`;
-    document.getElementById("summary-total").textContent = `$${calculation.total.toFixed(2)}`;
+    document.getElementById("summary-plan-description").textContent =
+      planDescription;
+    document.getElementById("summary-plan-price").textContent =
+      `$${price.toFixed(2)}`;
+    document.getElementById("summary-subtotal").textContent =
+      `$${calculation.baseImp.toFixed(2)}`;
+    document.getElementById("summary-tax").textContent =
+      `$${calculation.tax.toFixed(2)}`;
+    document.getElementById("summary-total").textContent =
+      `$${calculation.total.toFixed(2)}`;
   }
 
   // Inicialización del DOM
@@ -712,7 +750,12 @@ const genId = () => {
         const targetSection = this.id.replace("tab-", "plans-");
 
         planTabs.forEach((t) => {
-          t.classList.remove("active", "bg-white", "text-gray-900", "shadow-sm");
+          t.classList.remove(
+            "active",
+            "bg-white",
+            "text-gray-900",
+            "shadow-sm"
+          );
           t.classList.add("text-gray-600", "hover:text-gray-900");
         });
 
@@ -722,7 +765,9 @@ const genId = () => {
         planSections.forEach((section) => section.classList.add("hidden"));
         document.getElementById(targetSection).classList.remove("hidden");
 
-        const firstPlan = document.querySelector(`#${targetSection} input[name="selectedPlan"]`);
+        const firstPlan = document.querySelector(
+          `#${targetSection} input[name="selectedPlan"]`
+        );
         if (firstPlan) {
           firstPlan.checked = true;
           selectPlan(firstPlan);
@@ -776,7 +821,9 @@ const genId = () => {
     const surname = form.querySelector("#surname");
     const email = form.querySelector("#email");
     const merchantCustomerId = form.querySelector("#merchantCustomerId");
-    const selectedPlan = form.querySelector('input[name="selectedPlan"]:checked');
+    const selectedPlan = form.querySelector(
+      'input[name="selectedPlan"]:checked'
+    );
 
     const requiredFields = [
       { field: givenName, name: "Nombres" },
@@ -803,19 +850,28 @@ const genId = () => {
     const idRegex = /^[0-9A-Za-z]+$/;
 
     if (!nameRegex.test(givenName.value)) {
-      showNotification("El nombre solo debe contener letras y espacios", "warning");
+      showNotification(
+        "El nombre solo debe contener letras y espacios",
+        "warning"
+      );
       givenName.focus();
       return false;
     }
 
     if (middleName.value && !nameRegex.test(middleName.value)) {
-      showNotification("El segundo nombre solo debe contener letras y espacios", "warning");
+      showNotification(
+        "El segundo nombre solo debe contener letras y espacios",
+        "warning"
+      );
       middleName.focus();
       return false;
     }
 
     if (!nameRegex.test(surname.value)) {
-      showNotification("Los apellidos solo deben contener letras y espacios", "warning");
+      showNotification(
+        "Los apellidos solo deben contener letras y espacios",
+        "warning"
+      );
       surname.focus();
       return false;
     }
@@ -878,7 +934,11 @@ const genId = () => {
   }
 
   // === Carga del widget con guard anti-duplicados ===
-  function loadWidget(checkoutId, isSubscription = false, subscriptionData = null) {
+  function loadWidget(
+    checkoutId,
+    isSubscription = false,
+    subscriptionData = null
+  ) {
     const mount = document.getElementById("widget-mount");
     if (!mount) return;
 
@@ -911,7 +971,9 @@ const genId = () => {
         registerCard: "Guardar información de tarjeta para pagos futuros",
       },
       onReady: function () {
-        const form = document.querySelector("#widget-mount form.wpwl-form-card");
+        const form = document.querySelector(
+          "#widget-mount form.wpwl-form-card"
+        );
         const payBtn = form?.querySelector(".wpwl-button-pay");
 
         // para suscripción: checkbox de guardar tarjeta
@@ -954,8 +1016,11 @@ const genId = () => {
     s.onerror = () => log("Error cargando widget", "err");
     s.onload = () => {
       log("Widget cargado ✓", "ok");
-      log(`Tipo de pago: ${isSubscription ? "Suscripción" : "Pago único"}`, "ok");
-      log(`✅ Widget configurado para redirigir a: ${callbackUrl}`, "ok");
+      log(
+        `Tipo de pago: ${isSubscription ? "Suscripción" : "Pago único"}`,
+        "ok"
+      );
+      log(`Widget configurado para redirigir a: ${callbackUrl}`, "ok");
     };
     document.body.appendChild(s);
   }
@@ -977,7 +1042,9 @@ const genId = () => {
       const fd = new FormData(payForm);
       const amount = String(fd.get("amount") || "1.00").trim();
 
-      const selectedPlan = document.querySelector('input[name="selectedPlan"]:checked');
+      const selectedPlan = document.querySelector(
+        'input[name="selectedPlan"]:checked'
+      );
       if (!selectedPlan) {
         alert("Por favor selecciona un plan");
         return;
@@ -1001,7 +1068,7 @@ const genId = () => {
       const middleName =
         middleNameValue && String(middleNameValue).trim().length >= 2
           ? middleNameValue
-          : null;
+          : "nd";
 
       const basePayload = {
         merchantTransactionId: String(fd.get("merchantTransactionId")),
@@ -1046,10 +1113,13 @@ const genId = () => {
             planType: data.planType,
           };
 
-          sessionStorage.setItem("subscriptionData", JSON.stringify(subscriptionData));
+          sessionStorage.setItem(
+            "subscriptionData",
+            JSON.stringify(subscriptionData)
+          );
           loadWidget(data.id, true, subscriptionData);
         } else {
-          log("💳 Creando pago único...");
+          log("Creando pago único...");
 
           const oneTimePayload = {
             ...basePayload,
@@ -1073,10 +1143,39 @@ const genId = () => {
           loadWidget(data.id, false);
         }
       } catch (e) {
-        const errorMessage = e instanceof Error ? e.message : String(e);
+        let errorMessage = e instanceof Error ? e.message : String(e);
         log(`Error completo: ${errorMessage}`, "err");
         console.error("Error detallado:", e);
-        alert(`Error al procesar el pago: ${errorMessage}`);
+
+        try {
+          // Intentar extraer el mensaje de error del texto de respuesta
+          const errorText = errorMessage.startsWith("{")
+            ? JSON.parse(errorMessage)
+            : null;
+          if (errorText && errorText.message) {
+            errorMessage = errorText.message;
+          }
+        } catch (jsonError) {
+          // Si no se puede parsear como JSON, usamos el mensaje original
+        }
+
+        // Verificar diferentes formatos posibles del error de ID duplicado
+        if (
+          errorMessage.includes("Unique constraint failed") ||
+          errorMessage.includes("merchantCustomerId") ||
+          (errorMessage === "Internal server error" &&
+            e.toString().includes("merchantCustomerId"))
+        ) {
+          showNotification(
+            "Ya existe un cliente registrado con este número de identificación. Por favor, utiliza otro número o contacta a soporte si crees que esto es un error.",
+            "error"
+          );
+        } else {
+          showNotification(
+            "Error al procesar el pago. Por favor, verifica la información e intenta nuevamente.",
+            "error"
+          );
+        }
       }
     });
   }
