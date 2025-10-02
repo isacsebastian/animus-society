@@ -20,122 +20,88 @@ const genId = () => {
   <Notification />
 
   <!-- CSS GLOBAL para el widget (no scoping de Astro) -->
-  <style is:global id="wpwl-custom">
-    /* Tipografía y tamaño base coherentes con tu form (text-sm, sin negrita) */
-    #widget-mount .wpwl-container {
-      font-family: inherit !important;
-      font-size: 0.875rem !important; /* text-sm */
-      line-height: 1.5 !important;
-      font-weight: 400 !important;     /* sin negrita */
-    }
+  <!-- CSS GLOBAL para el widget (no scoping de Astro) -->
+<style is:global id="wpwl-custom">
+  /* Tipografía y tamaño base coherentes con tu form (text-sm, sin negrita) */
+  #widget-mount .wpwl-container {
+    font-family: inherit !important;
+    font-size: 0.875rem !important;
+    line-height: 1.5 !important;
+    font-weight: 400 !important;
+  }
 
-    /* Contenedor principal del form de tarjeta */
-    #widget-mount .wpwl-container.wpwl-container-card {
-      border: 1px solid #e5e7eb !important;  /* gray-200 */
-      border-radius: 12px !important;
-      padding: 16px !important;
-      background: #fff !important;
-    }
+  /* Contenedor y labels */
+  #widget-mount .wpwl-container.wpwl-container-card {
+    border: 1px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    padding: 16px !important;
+    background: #fff !important;
+  }
+  #widget-mount .wpwl-label {
+    font-family: inherit !important;
+    font-size: 0.875rem !important;
+    font-weight: 400 !important;
+    color: #374151 !important;
+    margin-bottom: 6px !important;
+  }
 
-    /* Labels (sin negrita, gray-700) */
-    #widget-mount .wpwl-label {
-      font-family: inherit !important;
-      font-size: 0.875rem !important;         /* text-sm */
-      font-weight: 400 !important;             /* sin negrita */
-      color: #374151 !important;               /* gray-700 */
-      margin-bottom: 6px !important;
-    }
-    #widget-mount .wpwl-group { margin-bottom: 14px !important; }
+  /* Inputs controlables (expiry, cardHolder, brand) */
+  #widget-mount .wpwl-control-expiry,
+  #widget-mount .wpwl-control-cardHolder,
+  #widget-mount .wpwl-control-brand {
+    font-family: inherit !important;
+    font-size: 0.875rem !important;
+    color: #111827 !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 10px !important;
+    padding: 10px 12px !important;
+    background: #fff !important;
+    outline: none !important;
+    height: 42px !important;
+  }
 
-    /* Select de marca */
-    #widget-mount .wpwl-control-brand {
-      font-family: inherit !important;
-      font-size: 0.875rem !important;
-      color: #111827 !important;               /* gray-900 */
-      border: 1px solid #d1d5db !important;    /* gray-300 */
-      border-radius: 10px !important;
-      padding: 10px 12px !important;
-      background: #fff !important;
-      outline: none !important;
-    }
-    #widget-mount .wpwl-control-brand:focus {
-      border-color: #111827 !important;
-      box-shadow: 0 0 0 2px rgba(17,24,39,0.10) !important;
-    }
+  /* Wrapper de iframes */
+  #widget-mount .wpwl-wrapper-cardNumber,
+  #widget-mount .wpwl-wrapper-cvv {
+    background: #fff !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+    position: relative !important;
+    isolation: isolate !important;
+  }
 
-    /* Inputs SÍ controlables (no-iframe): expiry y cardHolder */
-    #widget-mount .wpwl-control-expiry,
-    #widget-mount .wpwl-control-cardHolder {
-      font-family: inherit !important;
-      font-size: 0.875rem !important;          /* text-sm */
-      color: #111827 !important;               /* gray-900 */
-      border: 1px solid #d1d5db !important;    /* gray-300 */
-      border-radius: 10px !important;
-      padding: 10px 12px !important;
-      background: #fff !important;
-      outline: none !important;
-      height: 42px !important;
-    }
-    #widget-mount .wpwl-control-expiry:focus,
-    #widget-mount .wpwl-control-cardHolder:focus {
-      border-color: #111827 !important;        /* gray-900 */
-      box-shadow: 0 0 0 2px rgba(17,24,39,0.10) !important;
-    }
+  /* REGLAS ESPECÍFICAS PARA LOS IFRAMES (patch funcional) */
+  #widget-mount iframe[name="card.number"],
+  #widget-mount iframe[name="card.cvv"] {
+    display: block !important;
+    width: 100% !important;
+    height: 42px !important;
+    border-radius: 10px !important;
+    border: 1px solid #d1d5db !important;
+    background: #fff !important;
+    box-sizing: border-box !important;
 
-    /* === NÚMERO y CVV (iframes) ===
-       No se puede cambiar la tipografía/color internos por PCI.
-       Igualamos “look” (borde, radio, altura, foco) al resto. */
-    #widget-mount .wpwl-wrapper-cardNumber,
-    #widget-mount .wpwl-wrapper-cvv {
-      padding: 0 !important;
-      border: 0 !important;
-      background: #ffffff !important;
-    }
-    #widget-mount .wpwl-control-cardNumber,
-    #widget-mount .wpwl-control-cvv {
-      display: block !important;
-      width: 100% !important;
-      height: 42px !important;                 /* altura igual a tus inputs */
-      border: 1px solid #d1d5db !important;    /* gray-300 */
-      border-radius: 10px !important;
-      background: #ffffff !important;
-      outline: none !important;
-    }
-    #widget-mount .wpwl-control-cardNumber:focus,
-    #widget-mount .wpwl-control-cvv:focus {
-      border-color: #111827 !important;        /* gray-900 */
-      box-shadow: 0 0 0 2px rgba(17,24,39,0.10) !important;
-    }
+    /* Forzar tipografía si el navegador lo respeta + fallback visual */
+    color: #111827 !important;
+    font-family: inherit !important;
+    font-size: 0.875rem !important;
+    font-weight: 400 !important;
 
-    /* Botón pagar — sin negrita, text-sm */
-    #widget-mount .wpwl-button,
-    #widget-mount .wpwl-button-pay {
-      font-family: inherit !important;
-      font-size: 0.875rem !important;          /* text-sm */
-      font-weight: 400 !important;             /* sin negrita */
-      background: #111827 !important;          /* “negro” Animus */
-      color: #ffffff !important;
-      border-radius: 10px !important;
-      padding: 12px 16px !important;
-      border: 1px solid #111827 !important;
-      transition: transform .06s ease, filter .06s ease !important;
-    }
-    #widget-mount .wpwl-button:hover,
-    #widget-mount .wpwl-button-pay:hover {
-      filter: brightness(1.05) !important;
-      transform: translateY(-1px) !important;
-    }
+    /* Fallbacks visuales para oscurecer el contenido del iframe */
+    filter: contrast(1.55) brightness(0.92) saturate(1.12) !important;
+    mix-blend-mode: multiply !important;
+    backface-visibility: hidden !important;
+    transform: translateZ(0) !important;
+    isolation: isolate !important;
+  }
 
-    /* Hints / ayudas */
-    #widget-mount .wpwl-hint {
-      color: #6b7280 !important;               /* gray-500 */
-      font-size: 12px !important;
-    }
-
-    /* Si el widget añade adornos pseudo, los anulamos */
-    #widget-mount .wpwl-label::before,
-    #widget-mount .wpwl-label::after { content: none !important; }
-  </style>
+  /* foco más fuerte */
+  #widget-mount .wpwl-wrapper-cardNumber:focus-within iframe[name="card.number"],
+  #widget-mount .wpwl-wrapper-cvv:focus-within iframe[name="card.cvv"] {
+    filter: contrast(1.8) brightness(0.90) saturate(1.15) !important;
+    mix-blend-mode: multiply !important;
+  }
+</style>
 
   <style>
     html,
