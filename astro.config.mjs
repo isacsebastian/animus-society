@@ -13,14 +13,5 @@ export default defineConfig({
   },
   vite: {
     plugins: [tailwindcss()],
-    server: {
-      proxy: {
-        '/api': {
-          target: process.env.PUBLIC_BACKEND_URL || 'http://localhost:3000',
-          changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, '/api'),
-        },
-      },
-    },
   }
 });
