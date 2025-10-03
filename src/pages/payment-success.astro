@@ -1,7 +1,8 @@
 ---
-export const prerender = false; // <- MUY IMPORTANTE: fuerza SSR, los query llegan al server
+export const prerender = false; // Forzar SSR: los query llegan al server
 
 import Layout from "../layouts/Layout.astro";
+import { Buffer } from "node:buffer"; // Para tryParse(base64) en SSR Node
 
 type Json = Record<string, any>;
 
@@ -13,6 +14,7 @@ interface PaymentData {
   currency: string;
   merchantTransactionId: string;
   timestamp: string;
+  status?: "APPROVED" | "PENDING" | "DECLINED" | string;
   result?: {
     code?: string;
     description?: string;
@@ -42,23 +44,99 @@ interface PaymentData {
   [key: string]: any;
 }
 
-// -------------------- Helpers robustos --------------------
+/* =========================
+   Helpers SUSCRIPCIÓN
+   ========================= */
+const isSubscriptionPayload = (d: any) =>
+  !!(d && (d.paymentResult || d.subscription));
+
+const pickLatestPayment = (payments: any[] | undefined | null) => {
+  if (!Array.isArray(payments) || payments.length === 0) return null;
+  return payments
+    .slice()
+    .sort(
+      (a, b) =>
+        new Date(b.updatedAt ?? b.createdAt ?? 0).getTime() -
+        new Date(a.updatedAt ?? a.createdAt ?? 0).getTime()
+    )[0];
+};
+
+const toPaymentDataFromPaymentResult = (
+  pr: any,               // paymentResult o gatewayResponse del último payment
+  subscription?: any,    // subscription (opcional)
+  paymentToken?: any     // paymentToken (opcional)
+): PaymentData => {
+  const card =
+    pr.card ??
+    (paymentToken
+      ? {
+          last4Digits: paymentToken.last4,
+          expiryMonth: String(paymentToken.expiryMonth).padStart(2, "0"),
+          expiryYear: String(paymentToken.expiryYear),
+          holder: subscription?.customer?.givenName
+            ? `${subscription.customer.givenName} ${subscription.customer.surname ?? ""}`.trim()
+            : undefined,
+        }
+      : undefined);
+
+  const customer = pr.customer ?? subscription?.customer;
+
+  const ts =
+    pr.resultDetails?.AcquirerTimestamp ||
+    pr.timestamp ||
+    new Date().toISOString();
+
+  const status =
+    pr.status ??
+    (subscription?.payments
+      ? pickLatestPayment(subscription.payments)?.status
+      : undefined);
+
+  return {
+    id: pr.id ?? subscription?.id ?? "N/A",
+    paymentType: pr.paymentType ?? "RECURRING",
+    paymentBrand: pr.paymentBrand ?? paymentToken?.brand ?? "VISA",
+    amount: pr.amount ?? subscription?.amount ?? "0.00",
+    currency: pr.currency ?? subscription?.currency ?? "USD",
+    merchantTransactionId:
+      pr.merchantTransactionId ??
+      pickLatestPayment(subscription?.payments)?.merchantTransactionId ??
+      "N/A",
+    timestamp: ts,
+    status,
+    result: pr.result,
+    resultDetails: pr.resultDetails,
+    card,
+    customer: customer
+      ? {
+          givenName: customer.givenName,
+          middleName: customer.middleName,
+          surname: customer.surname,
+          merchantCustomerId: customer.merchantCustomerId,
+          email: customer.email,
+          ip: customer.ip,
+        }
+      : undefined,
+    registrationId:
+      pr.registrationId ??
+      subscription?.token?.token ??
+      subscription?.paymentToken?.token,
+    recurringType: pr.recurringType ?? "INITIAL",
+    customParameters: pr.customParameters,
+  } as PaymentData;
+};
+
+/* =========================
+   Helpers generales
+   ========================= */
 const tryParse = (raw: string | null): Json | null => {
   if (!raw) return null;
-  // 1) Intento directo
-  try {
-    return JSON.parse(raw);
-  } catch {}
-  // 2) Intento decodeURIComponent + parse
-  try {
-    return JSON.parse(decodeURIComponent(raw));
-  } catch {}
-  // 3) Intento base64 (algunos gateways envían base64 del JSON)
+  try { return JSON.parse(raw); } catch {}
+  try { return JSON.parse(decodeURIComponent(raw)); } catch {}
   try {
     const txt = Buffer.from(raw, "base64").toString("utf8");
     return JSON.parse(txt);
   } catch {}
-  // 4) Intento decodeURIComponent + base64
   try {
     const dec = decodeURIComponent(raw);
     const txt = Buffer.from(dec, "base64").toString("utf8");
@@ -67,13 +145,18 @@ const tryParse = (raw: string | null): Json | null => {
   return null;
 };
 
+// Detecta wrapper de gateway (200.x, 400, etc.)
+const isWrappedGateway = (d: any) =>
+  !!(
+    d &&
+    (d.error !== undefined || d.success !== undefined) &&
+    (d.details?.response?.gateway || d.details?.gateway)
+  );
+
 const extractFromHash = (u: URL): string | null => {
-  // #payment=... ó #/...?... casos raros
   const hash = u.hash || "";
   if (!hash) return null;
-  // #payment=JSON
   if (hash.startsWith("#payment=")) return hash.slice("#payment=".length);
-  // #/path?payment=...
   const qIndex = hash.indexOf("payment=");
   if (qIndex >= 0) {
     const sub = hash.slice(qIndex + "payment=".length);
@@ -83,12 +166,14 @@ const extractFromHash = (u: URL): string | null => {
   return null;
 };
 
-// -------------------- Lectura SSR --------------------
-const reqUrl = Astro.url; // SSR URL
+/* =========================
+   Config/constantes SSR
+   ========================= */
+const reqUrl = Astro.url;
+const API_URL = import.meta.env.PUBLIC_BACKEND_URL || ""; // <-- DECLARADO ANTES DE USAR
+
 const paymentParam =
-  reqUrl.searchParams.get("payment") ??
-  extractFromHash(reqUrl) ?? // por si te llega en hash (algunos proxies lo preservan)
-  null;
+  reqUrl.searchParams.get("payment") ?? extractFromHash(reqUrl) ?? null;
 
 let payment: string | null = paymentParam;
 let rawData: string | null = paymentParam;
@@ -98,7 +183,109 @@ let parseError: string | undefined = undefined;
 try {
   const parsed = tryParse(paymentParam);
   if (parsed) {
-    orderData = parsed as PaymentData;
+    if (isSubscriptionPayload(parsed)) {
+      // SUSCRIPCIÓN
+      const pr =
+        parsed.paymentResult ??
+        pickLatestPayment(parsed.subscription?.payments)?.gatewayResponse ??
+        pickLatestPayment(parsed.subscription?.payments) ??
+        null;
+
+      orderData = toPaymentDataFromPaymentResult(
+        pr ?? {},
+        parsed.subscription ?? undefined,
+        parsed.paymentToken ?? parsed.subscription?.token ?? undefined
+      );
+    } else if (isWrappedGateway(parsed)) {
+      // WRAPPER (ej. 200.300.404)
+      const gw =
+        parsed.details?.response?.gateway ||
+        parsed.details?.gateway ||
+        {};
+      const mtidFromUrl =
+        reqUrl.searchParams.get("merchantTransactionId") || undefined;
+
+      // 1) Construimos un "pendiente" por defecto
+      orderData = {
+        id: gw.ndc || "N/A",
+        paymentType: "RECURRING",
+        paymentBrand: gw.paymentBrand || "VISA",
+        amount: gw.amount || "0.00",
+        currency: gw.currency || "USD",
+        merchantTransactionId:
+          gw.merchantTransactionId || mtidFromUrl || gw.ndc || "N/A",
+        timestamp:
+          gw.resultDetails?.AcquirerTimestamp ||
+          gw.timestamp ||
+          new Date().toISOString(),
+        status: gw.status || "PENDING",
+        result: gw.result,               // aquí suele venir 200.300.404
+        resultDetails: gw.resultDetails,
+        card: gw.card,
+        registrationId: gw.registrationId,
+        recurringType: gw.recurringType,
+        customParameters: gw.customParameters,
+      } as PaymentData;
+
+      // 2) VERIFICACIÓN SSR con backend; si ya está aprobado, sobreescribimos orderData
+      const canVerify = API_URL && (orderData.merchantTransactionId || orderData.id);
+      if (canVerify) {
+        try {
+          const verifyRes = await fetch(`${API_URL}/payments/verify-recurring`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              merchantTransactionId: orderData.merchantTransactionId,
+              ndc: orderData.id,
+            }),
+          });
+          const verifyData = await verifyRes.json();
+
+          const approved =
+            verifyData?.success === true ||
+            verifyData?.status === "APPROVED" ||
+            (typeof verifyData?.resultCode === "string" &&
+              verifyData.resultCode.startsWith("000."));
+
+          if (approved) {
+            const pr =
+              verifyData?.payment?.gatewayResponse ||
+              verifyData?.paymentResult ||
+              verifyData?.payment ||
+              verifyData;
+
+            const sub = verifyData?.subscription;
+            const tok = verifyData?.paymentToken || sub?.token;
+
+            let mapped = toPaymentDataFromPaymentResult(pr ?? {}, sub, tok);
+
+            mapped.status = "APPROVED";
+            if (!mapped.result?.code) {
+              mapped.result = {
+                code: verifyData?.resultCode || "000.100.112",
+                description:
+                  verifyData?.resultDescription ||
+                  mapped.result?.description ||
+                  "Pago aprobado",
+              };
+            }
+            if ((!mapped.amount || mapped.amount === "0.00") && verifyData?.payment?.amount) {
+              mapped.amount = String(verifyData.payment.amount);
+            }
+            if (!mapped.currency && verifyData?.payment?.currency) {
+              mapped.currency = verifyData.payment.currency;
+            }
+
+            orderData = mapped;
+          }
+        } catch {
+          // Silenciar; si falla, dejamos "PENDING" y el polling de cliente lo arregla
+        }
+      }
+    } else {
+      // PAGO ÚNICO (JSON plano)
+      orderData = parsed as PaymentData;
+    }
   } else {
     parseError = paymentParam
       ? "No se pudo parsear 'payment' (probé JSON, decodeURIComponent y base64)."
@@ -108,64 +295,128 @@ try {
   parseError = e instanceof Error ? e.message : String(e);
 }
 
-// Determinar el estado del pago
+/* =========================
+   Estado del pago
+   ========================= */
+const resultCode = orderData?.result?.code ?? "";
+const statusText = orderData?.status ?? "";
 
-// Éxito más flexible: muchos resultados exitosos empiezan con "000."
-const isSuccess = !!(
-  orderData?.result?.code && orderData.result.code.startsWith("000.")
+const isPending = !!(
+  resultCode.startsWith("200.") ||
+  statusText === "PENDING" ||
+  resultCode === "200.300.404"
 );
+
+const isSuccess = !!(
+  (orderData?.result?.code && orderData.result.code.startsWith("000.")) ||
+  statusText === "APPROVED"
+);
+
 const isSubscription = Boolean(
   orderData?.registrationId ||
     orderData?.subscriptionDetails ||
     orderData?.customParameters?.SHOPPER_SUBSCRIPTION === "true"
 );
+
+// Config serializable para el script de polling
+const pendingCfg = {
+  isPending,
+  merchantTransactionId: orderData?.merchantTransactionId ?? "",
+  ndc: orderData?.id ?? "",
+  apiUrl: API_URL,
+};
 ---
 
 <Layout
-  title={`${isSuccess ? "Orden Confirmada" : "Estado de Pago"} - Animus Society`}
-  description={isSuccess
-    ? "Tu pago ha sido procesado"
-    : "Estado del intento de pago"}
+  title={`${isSuccess ? "Orden Confirmada" : isPending ? "Pago en Proceso" : "Estado de Pago"} - Animus Society`}
+  description={isSuccess ? "Tu pago ha sido procesado" : isPending ? "Estamos procesando tu pago" : "Estado del intento de pago"}
 >
-  <!--
-    Fallback client-side: si por política CORS/redirect el server no recibió ?payment,
-    intentamos rescatarlo en el cliente desde:
-    1) search ?payment=
-    2) hash #payment=
-    3) sessionStorage.lastPayment
-    y forzamos una recarga con ?payment= para que el SSR lo vea.
-  -->
+  <!-- Fallback client-side para reinyectar ?payment si vino en hash o storage -->
   <script>
-    // Script para verificar los parámetros del lado del cliente
     document.addEventListener("DOMContentLoaded", () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const payment = urlParams.get("payment");
+      const url = new URL(window.location.href);
+      const payment = url.searchParams.get("payment");
 
       if (payment) {
-        // Guardar el payment en sessionStorage por si se necesita
         sessionStorage.setItem("lastPayment", payment ?? "");
-
-        if (!window.location.href.includes("?payment=")) {
-          const newUrl = `${window.location.pathname}?payment=${encodeURIComponent(payment)}`;
-          window.location.href = newUrl;
+      } else {
+        const saved = sessionStorage.getItem("lastPayment");
+        if (saved) {
+          url.searchParams.set("payment", saved);
+          sessionStorage.removeItem("lastPayment");
+          window.location.replace(url.toString());
         }
-      } else if (sessionStorage.getItem("lastPayment")) {
-        const savedPayment = sessionStorage.getItem("lastPayment");
-        const newUrl = `${window.location.pathname}?payment=${encodeURIComponent(savedPayment ?? "")}`;
-        sessionStorage.removeItem("lastPayment");
-        window.location.href = newUrl;
       }
     });
   </script>
+
+  <!-- Config para polling (inyectada desde SSR) -->
+  <script type="application/json" id="pending-cfg">
+    {JSON.stringify(pendingCfg)}
+  </script>
+
+  <!-- Polling: si está pendiente, verifica estado en backend y recarga cuando esté aprobado -->
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      try {
+        const cfgEl = document.getElementById("pending-cfg");
+        if (!cfgEl) return;
+        const cfg = JSON.parse(cfgEl.textContent || "{}");
+        if (!cfg.isPending) return;
+
+        const apiUrl = cfg.apiUrl;
+        const payload = {
+          merchantTransactionId: cfg.merchantTransactionId || undefined,
+          ndc: cfg.ndc || undefined,
+        };
+
+        // Si no hay API_URL, hacemos 1 refresh tardío por si el backend ya aprobó.
+        if (!apiUrl) {
+          setTimeout(() => window.location.reload(), 7000);
+          return;
+        }
+
+        const maxTries = 12; // 12 * 5s = 60s
+        const intervalMs = 5000;
+
+        for (let i = 0; i < maxTries; i++) {
+          try {
+            const res = await fetch(`${apiUrl}/payments/verify-recurring`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+            const data = await res.json();
+
+            const ok =
+              data?.success === true ||
+              data?.status === "APPROVED" ||
+              (typeof data?.resultCode === "string" &&
+                data.resultCode.startsWith("000."));
+
+            if (ok) {
+              // Recarga dura para que el SSR pinte APPROVED con datos de BD
+              window.location.replace(window.location.href);
+              return;
+            }
+          } catch {
+            // Ignorar y seguir intentando
+          }
+          await new Promise((r) => setTimeout(r, intervalMs));
+        }
+      } catch {
+        // Silencioso
+      }
+    });
+  </script>
+
   <style is:global>
     html,
     body {
       overflow: auto !important;
       height: auto !important;
     }
-    .error-text {
-      color: #ef4444;
-    }
+    .error-text { color: #ef4444; }
   </style>
 
   <div class="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -174,17 +425,8 @@ const isSubscription = Boolean(
         href="/"
         class="inline-flex items-center justify-center w-10 h-10 text-gray-600 hover:text-gray-900 hover:bg-white rounded-full transition-all duration-200 shadow-sm border border-gray-200"
       >
-        <svg
-          class="w-5 h-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
         </svg>
       </a>
     </div>
@@ -193,128 +435,99 @@ const isSubscription = Boolean(
       {
         !orderData ? (
           <div class="text-center">
-            <h1 class="text-2xl font-semibold text-gray-900 mb-4">
-              No se encontró información del pago
-            </h1>
-            <p class="text-gray-600">
-              Por favor, contacta a soporte si crees que esto es un error.
-            </p>
+            <h1 class="text-2xl font-semibold text-gray-900 mb-4">No se encontró información del pago</h1>
+            <p class="text-gray-600">Por favor, contacta a soporte si crees que esto es un error.</p>
           </div>
         ) : (
           <>
             <div class="text-center mb-8">
               <div
                 class={`inline-flex items-center justify-center w-16 h-16 rounded-full mb-4 ${
-                  isSuccess ? "bg-green-100" : "bg-red-100"
+                  isSuccess ? "bg-green-100" : isPending ? "bg-yellow-100" : "bg-red-100"
                 }`}
               >
                 {isSuccess ? (
-                  <svg
-                    class="w-8 h-8 text-green-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M5 13l4 4L19 7"
-                    />
+                  <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                ) : isPending ? (
+                  <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M12 2a10 10 0 110 20 10 10 0 010-20z"/>
                   </svg>
                 ) : (
-                  <svg
-                    class="w-8 h-8 text-red-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M6 18L18 6M6 6l12 12"
-                    />
+                  <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                   </svg>
                 )}
               </div>
+
               <h1 class="text-2xl font-semibold text-gray-900 mb-2">
                 {isSuccess
-                  ? isSubscription
-                    ? "¡Suscripción Activada!"
-                    : "¡Pago Confirmado!"
-                  : "Error en el Pago"}
+                  ? (isSubscription ? "¡Suscripción Activada!" : "¡Pago Confirmado!")
+                  : (isPending ? "Pago en Proceso" : "Error en el Pago")}
               </h1>
+
               <p class="text-gray-600">
                 {isSuccess
-                  ? `Tu ${
-                      isSubscription ? "suscripción" : "pago"
-                    } ha sido procesado exitosamente`
-                  : orderData?.result?.description ||
-                    "Error procesando el pago"}
+                  ? `Tu ${isSubscription ? "suscripción" : "pago"} ha sido procesado exitosamente`
+                  : isPending
+                    ? "Estamos procesando tu pago. Esto puede tomar unos segundos."
+                    : (orderData?.result?.description || "Error procesando el pago")}
               </p>
             </div>
 
             <div class="bg-white shadow rounded-lg overflow-hidden">
               <div class="border-b border-gray-200 px-6 py-4">
-                <h2 class="text-lg font-medium text-gray-900">
-                  Detalles de la Transacción
-                </h2>
+                <h2 class="text-lg font-medium text-gray-900">Detalles de la Transacción</h2>
               </div>
 
               <div class="px-6 py-4 space-y-6">
                 <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   <div>
-                    <h3 class="text-sm font-medium text-gray-500">
-                      ID de Transacción
-                    </h3>
-                    <p class="mt-1 text-sm text-gray-900">
-                      {orderData.merchantTransactionId}
-                    </p>
+                    <h3 class="text-sm font-medium text-gray-500">ID de Transacción</h3>
+                    <p class="mt-1 text-sm text-gray-900">{orderData.merchantTransactionId}</p>
                   </div>
 
                   <div>
                     <h3 class="text-sm font-medium text-gray-500">Monto</h3>
-                    <p class="mt-1 text-sm text-gray-900">
-                      ${orderData.amount} {orderData.currency}
-                    </p>
+                    <p class="mt-1 text-sm text-gray-900">${orderData.amount} {orderData.currency}</p>
                   </div>
 
                   <div>
-                    <h3 class="text-sm font-medium text-gray-500">
-                      Método de Pago
-                    </h3>
+                    <h3 class="text-sm font-medium text-gray-500">Método de Pago</h3>
                     <p class="mt-1 text-sm text-gray-900">
-                      {orderData?.paymentBrand} (****{" "}
-                      {orderData?.card?.last4Digits})
+                      {orderData?.paymentBrand} (**** {orderData?.card?.last4Digits})
                     </p>
                   </div>
 
                   <div>
                     <h3 class="text-sm font-medium text-gray-500">Fecha</h3>
                     <p class="mt-1 text-sm text-gray-900">
-                      {new Date(orderData.timestamp).toLocaleString()}
+                      {(() => {
+                        const d = new Date(orderData.timestamp);
+                        const safe = isNaN(d.getTime()) ? new Date() : d;
+                        return safe.toLocaleString("es-EC", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          timeZone: "America/Guayaquil",
+                        });
+                      })()}
                     </p>
                   </div>
 
                   {orderData.resultDetails && (
                     <>
                       <div>
-                        <h3 class="text-sm font-medium text-gray-500">
-                          Código de Autorización
-                        </h3>
-                        <p class="mt-1 text-sm text-gray-900">
-                          {orderData.resultDetails.AuthCode}
-                        </p>
+                        <h3 class="text-sm font-medium text-gray-500">Código de Autorización</h3>
+                        <p class="mt-1 text-sm text-gray-900">{orderData.resultDetails.AuthCode}</p>
                       </div>
 
                       <div>
-                        <h3 class="text-sm font-medium text-gray-500">
-                          Número de Referencia
-                        </h3>
-                        <p class="mt-1 text-sm text-gray-900">
-                          {orderData.resultDetails.ReferenceNbr}
-                        </p>
+                        <h3 class="text-sm font-medium text-gray-500">Número de Referencia</h3>
+                        <p class="mt-1 text-sm text-gray-900">{orderData.resultDetails.ReferenceNbr}</p>
                       </div>
                     </>
                   )}
@@ -322,20 +535,15 @@ const isSubscription = Boolean(
 
                 {orderData.customer && (
                   <div>
-                    <h3 class="text-sm font-medium text-gray-500 mb-2">
-                      Información del Cliente
-                    </h3>
+                    <h3 class="text-sm font-medium text-gray-500 mb-2">Información del Cliente</h3>
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <p class="text-sm text-gray-900">
                         <span class="font-medium">Nombre:</span>{" "}
-                        {`${orderData.customer.givenName} ${
-                          orderData.customer.middleName || ""
-                        } ${orderData.customer.surname}`}
+                        {`${orderData.customer.givenName ?? ""} ${orderData.customer.middleName ?? ""} ${orderData.customer.surname ?? ""}`.trim()}
                       </p>
                       {orderData.customer.merchantCustomerId && (
                         <p class="text-sm text-gray-900">
-                          <span class="font-medium">ID de Cliente:</span>{" "}
-                          {orderData.customer.merchantCustomerId}
+                          <span class="font-medium">ID de Cliente:</span> {orderData.customer.merchantCustomerId}
                         </p>
                       )}
                     </div>
@@ -344,13 +552,10 @@ const isSubscription = Boolean(
 
                 {isSubscription && (
                   <div>
-                    <h3 class="text-sm font-medium text-gray-500 mb-2">
-                      Detalles de la Suscripción
-                    </h3>
+                    <h3 class="text-sm font-medium text-gray-500 mb-2">Detalles de la Suscripción</h3>
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                       <p class="text-sm text-gray-900">
-                        <span class="font-medium">ID de Registro:</span>{" "}
-                        {orderData.registrationId}
+                        <span class="font-medium">ID de Registro:</span> {orderData.registrationId}
                       </p>
                     </div>
                   </div>
