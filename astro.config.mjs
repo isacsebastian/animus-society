@@ -1,9 +1,12 @@
 import { defineConfig } from 'astro/config';
-
+import node from '@astrojs/node';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  output: 'static', 
+  output: 'server', // SSR completo para todas las páginas
+  adapter: node({
+    mode: 'standalone'
+  }),
   server: {
     host: true,
     port: 4321,
