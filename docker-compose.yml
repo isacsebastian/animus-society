@@ -5,7 +5,22 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        PUBLIC_BACKEND_URL: http://72.60.167.119:3000
+        PUBLIC_OPPWA_URL: https://eu-test.oppwa.com
     container_name: animus-society-frontend
     ports:
-      - "80:80"
+      - "80:4321"
+    environment:
+      - NODE_ENV=production
+      - HOST=0.0.0.0
+      - PORT=4321
+      - PUBLIC_BACKEND_URL=http://72.60.167.119:3000
+      - PUBLIC_OPPWA_URL=https://eu-test.oppwa.com
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4321"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

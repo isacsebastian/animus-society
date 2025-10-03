@@ -1,32 +1,40 @@
 # Build stage
 FROM node:20-alpine AS builder
 
-# Install pnpm
-RUN corepack enable && corepack prepare pnpm@latest --activate
-
 WORKDIR /app
 
 # Copy package files
-COPY package.json pnpm-lock.yaml ./
+COPY package.json ./
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile
+RUN npm install
 
 # Copy source files
 COPY . .
 
+# Build argument para variables de entorno
+ARG PUBLIC_BACKEND_URL
+ARG PUBLIC_OPPWA_URL
+
 # Build the application
-RUN pnpm run build
+RUN npm run build
 
 # Production stage
-FROM nginx:alpine
+FROM node:20-alpine
+
+WORKDIR /app
 
 # Copy built files from builder
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
 
-# Copy custom nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Expose port
+EXPOSE 4321
 
-EXPOSE 80
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:4321', (r) => r.statusCode === 200 ? process.exit(0) : process.exit(1))"
 
-CMD ["nginx", "-g", "daemon off;"]
+# Start the server
+CMD ["node", "./dist/server/entry.mjs"]

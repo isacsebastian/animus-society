@@ -3,12 +3,12 @@ import node from '@astrojs/node';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  output: 'server', // SSR completo para todas las páginas
+  output: 'server',
   adapter: node({
     mode: 'standalone'
   }),
   server: {
-    host: true,
+    host: '0.0.0.0',
     port: 4321,
   },
   vite: {
@@ -18,7 +18,7 @@ export default defineConfig({
         '/api': {
           target: process.env.PUBLIC_BACKEND_URL || 'http://localhost:3000',
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, '/api'), 
+          rewrite: (path) => path.replace(/^\/api/, '/api'),
         },
       },
     },
