@@ -877,7 +877,7 @@ const genId = () => {
   }
 
   async function createCheckout(payload) {
-    const res = await fetch("/api/payments/checkouts", {
+    const res = await fetch(`${BACKEND}/api/payments/checkouts`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -887,7 +887,7 @@ const genId = () => {
   }
 
   async function createSubscriptionCheckout(payload) {
-    const res = await fetch("/api/payments/subscriptions/checkout", {
+    const res = await fetch(`${BACKEND}/api/payments/subscriptions/checkout`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -897,7 +897,7 @@ const genId = () => {
   }
 
   async function completeSubscription(resourcePath, customerId, planType) {
-    const res = await fetch("/api/payments/subscriptions/complete", {
+    const res = await fetch(`${BACKEND}/api/payments/subscriptions/complete`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ resourcePath, customerId, planType }),
