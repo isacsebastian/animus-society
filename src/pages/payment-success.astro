@@ -376,11 +376,36 @@ const pendingCfg = {
           return;
         }
 
-        const maxTries = 12; // 12 * 5s = 60s
-        const intervalMs = 5000;
+        console.log('[Polling] Iniciando verificación de pago pendiente...', payload);
 
-        for (let i = 0; i < maxTries; i++) {
+        // Estrategia de polling: intentos más frecuentes al inicio, luego espaciados
+        const pollingSchedule = [
+          { attempt: 1, delay: 2000 },   // 2s
+          { attempt: 2, delay: 2000 },   // 4s
+          { attempt: 3, delay: 3000 },   // 7s
+          { attempt: 4, delay: 3000 },   // 10s
+          { attempt: 5, delay: 4000 },   // 14s
+          { attempt: 6, delay: 4000 },   // 18s
+          { attempt: 7, delay: 5000 },   // 23s
+          { attempt: 8, delay: 5000 },   // 28s
+          { attempt: 9, delay: 5000 },   // 33s
+          { attempt: 10, delay: 5000 },  // 38s
+          { attempt: 11, delay: 7000 },  // 45s
+          { attempt: 12, delay: 7000 },  // 52s
+          { attempt: 13, delay: 8000 },  // 60s
+        ];
+
+        for (let i = 0; i < pollingSchedule.length; i++) {
+          const schedule = pollingSchedule[i];
+          
+          // Esperar antes del intento (excepto el primero)
+          if (i > 0) {
+            await new Promise((r) => setTimeout(r, pollingSchedule[i - 1].delay));
+          }
+
           try {
+            console.log(`[Polling] Intento ${schedule.attempt}/${pollingSchedule.length}...`);
+            
             const res = await fetch(`${apiUrl}/payments/verify-recurring`, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -388,24 +413,47 @@ const pendingCfg = {
             });
             const data = await res.json();
 
-            const ok =
+            console.log(`[Polling] Respuesta intento ${schedule.attempt}:`, data);
+
+            const isApproved =
               data?.success === true ||
               data?.status === "APPROVED" ||
               (typeof data?.resultCode === "string" &&
                 data.resultCode.startsWith("000."));
 
-            if (ok) {
+            const isRejected =
+              data?.status === "REJECTED" ||
+              data?.status === "DECLINED" ||
+              (typeof data?.resultCode === "string" &&
+                !data.resultCode.startsWith("000.") &&
+                !data.resultCode.startsWith("200."));
+
+            if (isApproved) {
+              console.log('[Polling] ¡Pago aprobado! Recargando página...');
               // Recarga dura para que el SSR pinte APPROVED con datos de BD
               window.location.replace(window.location.href);
               return;
             }
-          } catch {
-            // Ignorar y seguir intentando
+
+            if (isRejected) {
+              console.log('[Polling] Pago rechazado. Recargando página...');
+              // También recargar para mostrar el estado de rechazo
+              window.location.replace(window.location.href);
+              return;
+            }
+
+            console.log(`[Polling] Pago aún pendiente (${data?.status || 'PENDING'}), continuando...`);
+          } catch (error) {
+            console.error(`[Polling] Error en intento ${schedule.attempt}:`, error);
+            // Continuar con el siguiente intento
           }
-          await new Promise((r) => setTimeout(r, intervalMs));
         }
-      } catch {
-        // Silencioso
+
+        console.log('[Polling] Se agotaron los intentos. Recargando página una última vez...');
+        // Después de todos los intentos, recargar de todas formas
+        window.location.reload();
+      } catch (error) {
+        console.error('[Polling] Error general en polling:', error);
       }
     });
   </script>
@@ -471,9 +519,21 @@ const pendingCfg = {
                 {isSuccess
                   ? `Tu ${isSubscription ? "suscripción" : "pago"} ha sido procesado exitosamente`
                   : isPending
-                    ? "Estamos procesando tu pago. Esto puede tomar unos segundos."
+                    ? "Estamos verificando tu pago con el procesador. Por favor espera unos segundos..."
                     : (orderData?.result?.description || "Error procesando el pago")}
               </p>
+              
+              {isPending && (
+                <div class="mt-4">
+                  <div class="flex items-center justify-center space-x-2">
+                    <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-yellow-600"></div>
+                    <span class="text-sm text-gray-600">Verificando estado del pago...</span>
+                  </div>
+                  <p class="text-xs text-gray-500 mt-2">
+                    Esta página se actualizará automáticamente cuando el pago sea confirmado
+                  </p>
+                </div>
+              )}
             </div>
 
             <div class="bg-white shadow rounded-lg overflow-hidden">
