@@ -4,7 +4,7 @@ import CartIcon from "../../components/svg/CartIcon.astro";
 import Notification from "../../components/Notification.astro";
 
 const BACKEND = import.meta.env.PUBLIC_BACKEND_URL || "http://localhost:3000";
-const OPPWA = import.meta.env.PUBLIC_OPPWA_URL || "https://eu-test.oppwa.com";
+const OPPWA = import.meta.env.PUBLIC_OPPWA_URL || "https://eu-prod.oppwa.com";
 
 const genId = () => {
   return `ORD_${Date.now().toString(36)}_${Math.random()
