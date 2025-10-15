@@ -1,0 +1,239 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { Image } from "astro:assets";
+import logo from "/src/assets/images/logo.png";
+---
+
+<Layout
+  title="Políticas de Privacidad - Animus Society"
+  description="Conoce nuestras políticas de privacidad y cómo protegemos tu información personal en Animus Society."
+>
+  <div class="relative h-full overflow-y-auto px-4 sm:px-6 md:px-8">
+    <div class="max-w-4xl mx-auto py-8 md:py-12">
+      <!-- Header con Logo -->
+      <div class="flex items-center justify-between mb-8">
+        <a href="/" class="hover:scale-110 transition-transform duration-200">
+          <Image
+            src={logo}
+            alt="logo animus"
+            class="w-16 md:w-20"
+            loading="eager"
+            quality="high"
+          />
+        </a>
+        <a
+          href="/"
+          class="text-white/70 hover:text-white transition-colors duration-200 text-sm md:text-base"
+        >
+          ← Volver al inicio
+        </a>
+      </div>
+
+      <!-- Contenido -->
+      <div
+        class="bg-white/5 backdrop-blur-md rounded-lg border border-white/10 p-6 md:p-10 shadow-2xl"
+      >
+        <h1
+          class="text-3xl md:text-5xl font-extrabold text-white mb-2 text-center"
+        >
+          Políticas de <span class="text-rosado-rojo">Privacidad</span>
+        </h1>
+        <p class="text-center text-white/60 mb-8 text-sm md:text-base">
+          Animus Society
+        </p>
+
+        <div class="space-y-6 text-white/80">
+          <p class="leading-relaxed">
+            Animus Society se compromete a proteger la privacidad de sus
+            usuarios y clientes. Esta política describe cómo recopilamos,
+            utilizamos y protegemos la información personal que nos proporciona
+            al utilizar nuestros servicios, nuestro sitio web <a
+              href="https://animussociety.com/"
+              class="text-terciary-400 hover:text-terciary-300 underline"
+              target="_blank"
+              rel="noopener noreferrer">https://animussociety.com/</a
+            > y la plataforma de pagos <a
+              href="https://pay.animussociety.com/"
+              class="text-terciary-400 hover:text-terciary-300 underline"
+              target="_blank"
+              rel="noopener noreferrer">https://pay.animussociety.com/</a
+            >.
+          </p>
+
+          <!-- Sección 1 -->
+          <div class="border-l-4 border-rosado-rojo pl-4 py-2">
+            <h2 class="text-xl md:text-2xl font-bold text-white mb-3">
+              1. Información que Recopilamos
+            </h2>
+            <p class="leading-relaxed mb-2">
+              Recopilamos información personal necesaria para la prestación de
+              nuestros servicios de gimnasio, incluyendo, pero no limitándose
+              a:
+            </p>
+            <ul class="list-disc list-inside space-y-1 ml-4">
+              <li>Nombre completo</li>
+              <li>Número de cédula/identificación</li>
+              <li>
+                Dirección de correo electrónico (enter.animus.society@gmail.com)
+              </li>
+              <li>Número de teléfono (+593 99 662 4172)</li>
+              <li>
+                Información de pago (a través de la plataforma de pagos)
+              </li>
+              <li>
+                Información de salud o condición física relevante para la
+                actividad deportiva
+              </li>
+            </ul>
+          </div>
+
+          <!-- Sección 2 -->
+          <div class="border-l-4 border-terciary-400 pl-4 py-2">
+            <h2 class="text-xl md:text-2xl font-bold text-white mb-3">
+              2. Uso de la Información
+            </h2>
+            <p class="leading-relaxed mb-2">
+              La información recopilada se utiliza para los siguientes fines:
+            </p>
+            <ul class="list-disc list-inside space-y-1 ml-4">
+              <li>Gestión de la membresía y acceso a las instalaciones</li>
+              <li>Procesamiento de pagos por servicios y productos</li>
+              <li>
+                Comunicación de información relevante sobre horarios, clases,
+                promociones y eventos
+              </li>
+              <li>Mejora de nuestros servicios y atención al cliente</li>
+              <li>Cumplimiento de obligaciones legales y de seguridad</li>
+            </ul>
+          </div>
+
+          <!-- Sección 3 -->
+          <div class="border-l-4 border-primary-400 pl-4 py-2">
+            <h2 class="text-xl md:text-2xl font-bold text-white mb-3">
+              3. Protección de la Información
+            </h2>
+            <p class="leading-relaxed">
+              Animus Society se compromete a mantener la seguridad de sus datos
+              personales, utilizando las medidas técnicas y organizativas
+              adecuadas para prevenir el acceso no autorizado, la alteración,
+              pérdida o tratamiento indebido de la información. La información
+              de pago se procesa a través de plataformas seguras (como
+              Datafast) que cumplen con los estándares de seguridad de datos.
+            </p>
+          </div>
+
+          <!-- Sección 4 -->
+          <div class="border-l-4 border-rosado-rojo pl-4 py-2">
+            <h2 class="text-xl md:text-2xl font-bold text-white mb-3">
+              4. Derechos del Titular de los Datos
+            </h2>
+            <p class="leading-relaxed">
+              Usted tiene derecho a solicitar el acceso, rectificación,
+              actualización o eliminación de sus datos personales. Para ejercer
+              estos derechos, puede contactarnos a través de los datos de
+              contacto proporcionados.
+            </p>
+          </div>
+
+          <!-- Sección 5 -->
+          <div class="border-l-4 border-terciary-400 pl-4 py-2">
+            <h2 class="text-xl md:text-2xl font-bold text-white mb-3">
+              5. Cambios en la Política de Privacidad
+            </h2>
+            <p class="leading-relaxed">
+              Animus Society se reserva el derecho de modificar esta política
+              para adaptarla a novedades legislativas o prácticas del sector.
+              Cualquier cambio será notificado a través de nuestros canales
+              habituales.
+            </p>
+          </div>
+
+          <!-- Contacto -->
+          <div
+            class="mt-8 bg-gradient-to-r from-primary-600/20 to-terciary-400/20 border border-white/10 rounded-lg p-6"
+          >
+            <h2 class="text-xl md:text-2xl font-bold text-white mb-4">
+              Contacto
+            </h2>
+            <p class="leading-relaxed mb-3">
+              Para cualquier consulta, requerimiento, o para ejercer sus
+              derechos relacionados con nuestras políticas, por favor, utilice
+              la siguiente información de contacto:
+            </p>
+            <ul class="space-y-2">
+              <li>
+                <strong class="text-white">Correo Electrónico:</strong>
+                <a
+                  href="mailto:enter.animus.society@gmail.com"
+                  class="text-terciary-400 hover:text-terciary-300 underline ml-2"
+                  >enter.animus.society@gmail.com</a
+                >
+              </li>
+              <li>
+                <strong class="text-white">Teléfono:</strong>
+                <a
+                  href="tel:+593996624172"
+                  class="text-terciary-400 hover:text-terciary-300 underline ml-2"
+                  >+593 99 662 4172</a
+                >
+              </li>
+              <li>
+                <strong class="text-white">Sitio Web:</strong>
+                <a
+                  href="https://animussociety.com/"
+                  class="text-terciary-400 hover:text-terciary-300 underline ml-2"
+                  target="_blank"
+                  rel="noopener noreferrer">https://animussociety.com/</a
+                >
+              </li>
+              <li>
+                <strong class="text-white">Plataforma de Pagos:</strong>
+                <a
+                  href="https://pay.animussociety.com/"
+                  class="text-terciary-400 hover:text-terciary-300 underline ml-2"
+                  target="_blank"
+                  rel="noopener noreferrer">https://pay.animussociety.com/</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Links -->
+      <div class="mt-8 text-center">
+        <a
+          href="/terms-and-conditions"
+          class="text-white/60 hover:text-white transition-colors duration-200 text-sm underline"
+        >
+          Ver Términos y Condiciones
+        </a>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  /* Estilos personalizados para el scroll */
+  .overflow-y-auto {
+    scrollbar-width: thin;
+    scrollbar-color: #b32dff #1a1a2e;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-track {
+    background: #1a1a2e;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-thumb {
+    background: #b32dff;
+    border-radius: 4px;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: #c767ff;
+  }
+</style>
