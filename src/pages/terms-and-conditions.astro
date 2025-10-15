@@ -1,0 +1,290 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { Image } from "astro:assets";
+import logo from "/src/assets/images/logo.png";
+---
+
+<Layout
+  title="Términos y Condiciones - Animus Society"
+  description="Lee los términos y condiciones de uso de los servicios e instalaciones de Animus Society."
+>
+  <div class="relative h-full overflow-y-auto px-4 sm:px-6 md:px-8">
+    <div class="max-w-4xl mx-auto py-8 md:py-12">
+      <!-- Header con Logo -->
+      <div class="flex items-center justify-between mb-8">
+        <a href="/" class="hover:scale-110 transition-transform duration-200">
+          <Image
+            src={logo}
+            alt="logo animus"
+            class="w-16 md:w-20"
+            loading="eager"
+            quality="high"
+          />
+        </a>
+        <a
+          href="/"
+          class="text-white/70 hover:text-white transition-colors duration-200 text-sm md:text-base"
+        >
+          ← Volver al inicio
+        </a>
+      </div>
+
+      <!-- Contenido -->
+      <div
+        class="bg-white/5 backdrop-blur-md rounded-lg border border-white/10 p-6 md:p-10 shadow-2xl"
+      >
+        <h1
+          class="text-3xl md:text-5xl font-extrabold text-white mb-2 text-center"
+        >
+          Términos y <span class="text-rosado-rojo">Condiciones</span>
+        </h1>
+        <p class="text-center text-white/60 mb-8 text-sm md:text-base">
+          Animus Society
+        </p>
+
+        <div class="space-y-6 text-white/80">
+          <p class="leading-relaxed">
+            Al inscribirse o utilizar los servicios e instalaciones de Animus
+            Society, usted acepta los siguientes términos y condiciones.
+          </p>
+
+          <!-- Sección 1: Membresía y Pagos -->
+          <div class="border-l-4 border-rosado-rojo pl-4 py-2">
+            <h2 class="text-xl md:text-2xl font-bold text-white mb-3">
+              1. Membresía y Pagos
+            </h2>
+            <ul class="list-disc list-inside space-y-2 ml-4">
+              <li>La membresía es personal e intransferible.</li>
+              <li>
+                El acceso a las instalaciones está sujeto al pago oportuno de
+                las cuotas de membresía o servicios adquiridos.
+              </li>
+              <li>
+                Todos los pagos se realizan a través de los medios disponibles,
+                incluyendo la plataforma <a
+                  href="https://pay.animussociety.com/"
+                  class="text-terciary-400 hover:text-terciary-300 underline"
+                  target="_blank"
+                  rel="noopener noreferrer">https://pay.animussociety.com/</a
+                >.
+              </li>
+              <li>
+                Las cuotas de membresía no son reembolsables, salvo disposición
+                legal o política interna que indique lo contrario.
+              </li>
+              <li>
+                Animus Society se reserva el derecho de modificar las tarifas
+                de membresía y servicios, notificando con antelación a sus
+                miembros.
+              </li>
+            </ul>
+          </div>
+
+          <!-- Sección 2: Uso de las Instalaciones -->
+          <div class="border-l-4 border-terciary-400 pl-4 py-2">
+            <h2 class="text-xl md:text-2xl font-bold text-white mb-3">
+              2. Uso de las Instalaciones
+            </h2>
+            <ul class="list-disc list-inside space-y-2 ml-4">
+              <li>
+                Los usuarios deben utilizar la indumentaria y calzado deportivo
+                adecuado dentro de las áreas de entrenamiento.
+              </li>
+              <li>
+                Es obligatorio el uso de toalla personal y la limpieza de los
+                equipos después de cada uso.
+              </li>
+              <li>
+                Se debe respetar el orden, la limpieza y la convivencia
+                pacífica con otros miembros y el personal.
+              </li>
+              <li>
+                El uso de cualquier equipo debe ser realizado siguiendo las
+                instrucciones del personal o las indicaciones de seguridad del
+                equipo.
+              </li>
+              <li>
+                Animus Society no se responsabiliza por la pérdida o robo de
+                objetos personales.
+              </li>
+              <li>
+                Nos reservamos el derecho de revocar la membresía o el acceso a
+                cualquier usuario que incumpla gravemente las normas de
+                conducta o ponga en riesgo la seguridad de otros.
+              </li>
+            </ul>
+          </div>
+
+          <!-- Sección 3: Salud y Aptitud Física -->
+          <div class="border-l-4 border-primary-400 pl-4 py-2">
+            <h2 class="text-xl md:text-2xl font-bold text-white mb-3">
+              3. Salud y Aptitud Física
+            </h2>
+            <ul class="list-disc list-inside space-y-2 ml-4">
+              <li>
+                Cada usuario declara estar en condiciones físicas adecuadas para
+                la práctica deportiva y exime a Animus Society de cualquier
+                responsabilidad por lesiones o problemas de salud derivados de
+                su entrenamiento, salvo negligencia comprobada de la empresa.
+              </li>
+              <li>
+                Se recomienda consultar a un médico antes de iniciar cualquier
+                rutina de ejercicio.
+              </li>
+            </ul>
+          </div>
+
+          <!-- Sección 4: Propiedad Intelectual -->
+          <div class="border-l-4 border-rosado-rojo pl-4 py-2">
+            <h2 class="text-xl md:text-2xl font-bold text-white mb-3">
+              4. Propiedad Intelectual y Derechos
+            </h2>
+            <p class="leading-relaxed">
+              Los contenidos del sitio web <a
+                href="https://animussociety.com/"
+                class="text-terciary-400 hover:text-terciary-300 underline"
+                target="_blank"
+                rel="noopener noreferrer">https://animussociety.com/</a
+              >, incluyendo textos, gráficos y logotipos, son propiedad de Animus
+              Society y están protegidos por leyes de propiedad intelectual.
+            </p>
+          </div>
+
+          <!-- Sección 5: Políticas de Envío y Entrega -->
+          <div class="border-l-4 border-terciary-400 pl-4 py-2">
+            <h2 class="text-xl md:text-2xl font-bold text-white mb-3">
+              5. Políticas de Envío y Entrega
+            </h2>
+
+            <h3 class="text-lg font-semibold text-white mt-4 mb-2">
+              5.1. Entrega de Servicios (Membresías y Clases)
+            </h3>
+            <ul class="list-disc list-inside space-y-2 ml-4">
+              <li>
+                <strong>Servicio de Acceso:</strong> La activación del acceso a
+                las instalaciones o a las clases en línea se realiza de forma inmediata
+                o dentro de un plazo máximo de 24 horas laborables tras la confirmación
+                del pago en <a
+                  href="https://pay.animussociety.com/"
+                  class="text-terciary-400 hover:text-terciary-300 underline"
+                  target="_blank"
+                  rel="noopener noreferrer">https://pay.animussociety.com/</a
+                >.
+              </li>
+              <li>
+                <strong>Confirmación:</strong> La confirmación de la compra y la
+                activación se notificará al cliente vía correo electrónico (enter.animus.society@gmail.com)
+                o por mensaje a su número de contacto.
+              </li>
+            </ul>
+
+            <h3 class="text-lg font-semibold text-white mt-4 mb-2">
+              5.2. Entrega de Productos Físicos (Si aplica)
+            </h3>
+            <ul class="list-disc list-inside space-y-2 ml-4">
+              <li>
+                <strong>Plazo de Entrega:</strong> Los productos físicos comprados
+                en las instalaciones o a través de la plataforma se entregarán en
+                el lugar acordado o serán despachados mediante servicio de mensajería.
+              </li>
+              <li>
+                <strong>Costo de Envío:</strong> El costo y el tiempo de envío variarán
+                según la ubicación de entrega y será comunicado al cliente antes
+                de finalizar la compra.
+              </li>
+              <li>
+                <strong>Retiro en el Gimnasio:</strong> Existe la opción de retirar
+                productos en las instalaciones de Animus Society sin costo adicional.
+              </li>
+            </ul>
+          </div>
+
+          <!-- Contacto -->
+          <div
+            class="mt-8 bg-gradient-to-r from-primary-600/20 to-terciary-400/20 border border-white/10 rounded-lg p-6"
+          >
+            <h2 class="text-xl md:text-2xl font-bold text-white mb-4">
+              Contacto
+            </h2>
+            <p class="leading-relaxed mb-3">
+              Para cualquier consulta, requerimiento, o para ejercer sus
+              derechos relacionados con nuestras políticas, por favor, utilice
+              la siguiente información de contacto:
+            </p>
+            <ul class="space-y-2">
+              <li>
+                <strong class="text-white">Correo Electrónico:</strong>
+                <a
+                  href="mailto:enter.animus.society@gmail.com"
+                  class="text-terciary-400 hover:text-terciary-300 underline ml-2"
+                  >enter.animus.society@gmail.com</a
+                >
+              </li>
+              <li>
+                <strong class="text-white">Teléfono:</strong>
+                <a
+                  href="tel:+593996624172"
+                  class="text-terciary-400 hover:text-terciary-300 underline ml-2"
+                  >+593 99 662 4172</a
+                >
+              </li>
+              <li>
+                <strong class="text-white">Sitio Web:</strong>
+                <a
+                  href="https://animussociety.com/"
+                  class="text-terciary-400 hover:text-terciary-300 underline ml-2"
+                  target="_blank"
+                  rel="noopener noreferrer">https://animussociety.com/</a
+                >
+              </li>
+              <li>
+                <strong class="text-white">Plataforma de Pagos:</strong>
+                <a
+                  href="https://pay.animussociety.com/"
+                  class="text-terciary-400 hover:text-terciary-300 underline ml-2"
+                  target="_blank"
+                  rel="noopener noreferrer">https://pay.animussociety.com/</a
+                >
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer Links -->
+      <div class="mt-8 text-center">
+        <a
+          href="/privacy-policy"
+          class="text-white/60 hover:text-white transition-colors duration-200 text-sm underline"
+        >
+          Ver Políticas de Privacidad
+        </a>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  /* Estilos personalizados para el scroll */
+  .overflow-y-auto {
+    scrollbar-width: thin;
+    scrollbar-color: #b32dff #1a1a2e;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-track {
+    background: #1a1a2e;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-thumb {
+    background: #b32dff;
+    border-radius: 4px;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: #c767ff;
+  }
+</style>
