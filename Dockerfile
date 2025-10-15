@@ -17,7 +17,7 @@ ARG PUBLIC_BACKEND_URL
 ARG PUBLIC_OPPWA_URL
 
 # Build the application
-RUN npm run build
+RUN npm install --legacy-peer-deps
 
 # Production stage
 FROM node:20-alpine
