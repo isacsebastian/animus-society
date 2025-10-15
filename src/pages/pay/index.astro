@@ -233,13 +233,8 @@ const genId = () => {
               />
             </div>
 
-            <div>
-              <label
-                for="merchantCustomerId"
-                class="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Número de Identificación <span class="text-red-500">*</span>
-              </label>
+            <!-- Campo oculto - se llena automáticamente con identificationDocId -->
+            <div style="display: none;">
               <input
                 type="text"
                 id="merchantCustomerId"
@@ -248,9 +243,171 @@ const genId = () => {
                 minlength="10"
                 maxlength="16"
                 pattern="[0-9A-Za-z]+"
-                title="Ingrese un número de cédula, DNI o pasaporte válido (solo números y letras)"
+              />
+            </div>
+
+            <!-- Nuevos campos obligatorios DataFast Fase 2 -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label
+                  for="identificationDocType"
+                  class="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Tipo de Documento <span class="text-red-500">*</span>
+                </label>
+                <select
+                  id="identificationDocType"
+                  name="identificationDocType"
+                  required
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-colors text-gray-900"
+                >
+                  <option value="">Seleccione...</option>
+                  <option value="IDCARD">Cédula</option>
+                  <option value="PASSPORT">Pasaporte</option>
+                  <option value="TAXCARD">RUC</option>
+                </select>
+              </div>
+              <div>
+                <label
+                  for="identificationDocId"
+                  class="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Número de Documento <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="identificationDocId"
+                  name="identificationDocId"
+                  required
+                  minlength="10"
+                  maxlength="16"
+                  pattern="[0-9A-Za-z]+"
+                  title="Número de cédula, pasaporte o RUC"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-colors text-gray-900"
+                  placeholder="1234567890"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
+                for="phone"
+                class="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Teléfono/Celular <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="tel"
+                id="phone"
+                name="phone"
+                required
+                pattern="[+]?[0-9]{10,15}"
+                title="Ingrese un número de teléfono válido (10-15 dígitos, puede incluir + al inicio)"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-colors text-gray-900"
-                placeholder="1234567890"
+                placeholder="+593987654321"
+              />
+            </div>
+
+            <div>
+              <label
+                for="street1"
+                class="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Dirección <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="street1"
+                name="street1"
+                required
+                minlength="5"
+                maxlength="100"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-colors text-gray-900"
+                placeholder="Av. Amazonas N123"
+              />
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label
+                  for="city"
+                  class="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Ciudad <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="city"
+                  name="city"
+                  required
+                  minlength="3"
+                  maxlength="50"
+                  pattern="[A-Za-zÁáÉéÍíÓóÚúÑñ\s]+"
+                  title="Solo letras y espacios"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-colors text-gray-900"
+                  placeholder="Quito"
+                />
+              </div>
+              <div>
+                <label
+                  for="state"
+                  class="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Provincia <span class="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="state"
+                  name="state"
+                  required
+                  minlength="3"
+                  maxlength="50"
+                  pattern="[A-Za-zÁáÉéÍíÓóÚúÑñ\s]+"
+                  title="Solo letras y espacios"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-colors text-gray-900"
+                  placeholder="Pichincha"
+                />
+              </div>
+              <div>
+                <label
+                  for="country"
+                  class="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  País <span class="text-red-500">*</span>
+                </label>
+                <select
+                  id="country"
+                  name="country"
+                  required
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-colors text-gray-900"
+                >
+                  <option value="EC">Ecuador</option>
+                  <option value="US">Estados Unidos</option>
+                  <option value="CO">Colombia</option>
+                  <option value="PE">Perú</option>
+                  <option value="MX">México</option>
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label
+                for="postcode"
+                class="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Código Postal <span class="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="postcode"
+                name="postcode"
+                required
+                minlength="4"
+                maxlength="10"
+                pattern="[0-9A-Za-z\-]+"
+                title="Código postal válido"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-gray-900 transition-colors text-gray-900"
+                placeholder="170515"
               />
             </div>
 
@@ -467,6 +624,34 @@ const genId = () => {
                       <div class="text-right">
                         <span class="text-2xl font-bold text-gray-900">$1</span>
                         <p class="text-sm text-gray-600">/único</p>
+                      </div>
+                    </div>
+                  </label>
+
+                  <label class="plan-option cursor-pointer">
+                    <input
+                      type="radio"
+                      name="selectedPlan"
+                      value="test-reject"
+                      data-price="3.00"
+                      data-name="Prueba Rechazo"
+                      data-description="Prueba de transacción rechazada (DataFast rechaza $3.00)"
+                      class="sr-only"
+                    />
+                    <div
+                      class="flex items-center justify-between p-4 border-2 border-red-300 rounded-lg hover:border-red-500 transition-colors bg-red-50"
+                    >
+                      <div class="flex-1">
+                        <h4 class="font-medium text-red-900">
+                          ❌ Prueba Rechazo
+                        </h4>
+                        <p class="text-sm text-red-600">
+                          Test de transacción rechazada ($3.00)
+                        </p>
+                      </div>
+                      <div class="text-right">
+                        <span class="text-2xl font-bold text-red-900">$3</span>
+                        <p class="text-sm text-red-600">/único</p>
                       </div>
                     </div>
                   </label>
@@ -779,6 +964,24 @@ const genId = () => {
       defaultPlan.checked = true;
       selectPlan(defaultPlan);
     }
+
+    // Copiar automáticamente identificationDocId a merchantCustomerId
+    const identificationDocIdInput = document.getElementById(
+      "identificationDocId"
+    );
+    const merchantCustomerIdInput =
+      document.getElementById("merchantCustomerId");
+
+    if (identificationDocIdInput && merchantCustomerIdInput) {
+      identificationDocIdInput.addEventListener("input", function () {
+        merchantCustomerIdInput.value = this.value;
+      });
+
+      // Copiar valor inicial si existe
+      if (identificationDocIdInput.value) {
+        merchantCustomerIdInput.value = identificationDocIdInput.value;
+      }
+    }
   });
 
   // Función de validación de campos
@@ -794,15 +997,31 @@ const genId = () => {
     const surname = form.querySelector("#surname");
     const email = form.querySelector("#email");
     const merchantCustomerId = form.querySelector("#merchantCustomerId");
+    const identificationDocType = form.querySelector("#identificationDocType");
+    const identificationDocId = form.querySelector("#identificationDocId");
+    const phone = form.querySelector("#phone");
+    const street1 = form.querySelector("#street1");
+    const city = form.querySelector("#city");
+    const state = form.querySelector("#state");
+    const country = form.querySelector("#country");
+    const postcode = form.querySelector("#postcode");
     const selectedPlan = form.querySelector(
       'input[name="selectedPlan"]:checked'
     );
 
     const requiredFields = [
-      { field: givenName, name: "Nombres" },
+      { field: givenName, name: "Primer nombre" },
       { field: surname, name: "Apellidos" },
       { field: email, name: "Email" },
       { field: merchantCustomerId, name: "Número de Identificación" },
+      { field: identificationDocType, name: "Tipo de Documento" },
+      { field: identificationDocId, name: "Número de Documento" },
+      { field: phone, name: "Teléfono" },
+      { field: street1, name: "Dirección" },
+      { field: city, name: "Ciudad" },
+      { field: state, name: "Provincia" },
+      { field: country, name: "País" },
+      { field: postcode, name: "Código Postal" },
     ];
 
     for (const { field, name } of requiredFields) {
@@ -998,6 +1217,33 @@ const genId = () => {
           "#widget-mount form.wpwl-form-card"
         );
         const payBtn = form?.querySelector(".wpwl-button-pay");
+
+        // Agregar selector de Tipo de Crédito después del CVV
+        if (form) {
+          const tipoCreditoHtml =
+            '<div class="wpwl-group wpwl-group-custom" style="margin-bottom: 15px;">' +
+            '<div class="wpwl-label wpwl-label-custom">Tipo de pago</div>' +
+            '<div class="wpwl-wrapper wpwl-wrapper-custom">' +
+            '<select name="customParameters[SHOPPER_TIPOCREDITO]" class="wpwl-control wpwl-control-brand" style="width: 100%;">' +
+            '<option value="00" selected>Corriente (Pago único)</option>' +
+            "</select>" +
+            "</div>" +
+            "</div>";
+
+          // Insertar después del wrapper de CVV
+          const cvvWrapper = form.querySelector(".wpwl-wrapper-cvv");
+          if (cvvWrapper && cvvWrapper.parentElement) {
+            cvvWrapper.parentElement.insertAdjacentHTML(
+              "afterend",
+              tipoCreditoHtml
+            );
+            log(
+              "Campo SHOPPER_TIPOCREDITO agregado visualmente (Corriente)",
+              "ok"
+            );
+          }
+        }
+
         if (isSubscription && form) {
           const submitBtn = form.querySelector(".wpwl-button-pay");
           const box = document.createElement("div");
@@ -1095,6 +1341,16 @@ const genId = () => {
         surname: String(fd.get("surname")),
         email: String(fd.get("email")),
         merchantCustomerId: String(fd.get("merchantCustomerId")),
+        // Nuevos campos obligatorios DataFast Fase 2
+        identificationDocType: String(fd.get("identificationDocType")),
+        identificationDocId: String(fd.get("identificationDocId")),
+        phone: String(fd.get("phone")),
+        street1: String(fd.get("street1")),
+        city: String(fd.get("city")),
+        state: String(fd.get("state")),
+        country: String(fd.get("country")),
+        postcode: String(fd.get("postcode")),
+        // Impuestos
         base0: String(fd.get("base0")),
         baseImp: String(fd.get("baseImp")),
         iva: String(fd.get("iva")),
