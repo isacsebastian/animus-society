@@ -1,5 +1,3 @@
-import { BACKEND } from '../config/env';
-
 export interface PaymentHistoryItem {
   id: string;
   customerName: string;
@@ -101,7 +99,7 @@ export async function getPaymentHistory(
     params.append('search', search);
   }
 
-  const response = await fetch(`${BACKEND}/api/history-payments?${params.toString()}`);
+  const response = await fetch(`/api/history-payments?${params.toString()}`);
   
   if (!response.ok) {
     throw new Error('Error al obtener el historial de pagos');
@@ -111,7 +109,7 @@ export async function getPaymentHistory(
 }
 
 export async function getPaymentStats(): Promise<PaymentStats> {
-  const response = await fetch(`${BACKEND}/api/history-payments/stats`);
+  const response = await fetch('/api/history-payments/stats');
   
   if (!response.ok) {
     throw new Error('Error al obtener las estadísticas');
@@ -121,7 +119,7 @@ export async function getPaymentStats(): Promise<PaymentStats> {
 }
 
 export async function getPaymentDetail(paymentId: string): Promise<PaymentDetail> {
-  const response = await fetch(`${BACKEND}/api/history-payments/${paymentId}`);
+  const response = await fetch(`/api/history-payments/${paymentId}`);
   
   if (!response.ok) {
     throw new Error('Error al obtener el detalle del pago');
@@ -131,7 +129,7 @@ export async function getPaymentDetail(paymentId: string): Promise<PaymentDetail
 }
 
 export async function cancelSubscription(subscriptionId: string): Promise<{ message: string }> {
-  const response = await fetch(`${BACKEND}/api/payments/subscriptions/${subscriptionId}/cancel`, {
+  const response = await fetch(`/api/payments/subscriptions/${subscriptionId}/cancel`, {
     method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
