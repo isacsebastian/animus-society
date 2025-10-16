@@ -6,16 +6,16 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        PUBLIC_BACKEND_URL: http://72.60.167.119:3000
+        PUBLIC_BACKEND_URL: https://pay.animussociety.com
         PUBLIC_OPPWA_URL: https://eu-prod.oppwa.com
     container_name: animus-society-frontend
     ports:
-      - "80:4321"
+      - "4321:4321"
     environment:
       - NODE_ENV=production
       - HOST=0.0.0.0
       - PORT=4321
-      - PUBLIC_BACKEND_URL=http://72.60.167.119:3000
+      - PUBLIC_BACKEND_URL=https://pay.animussociety.com
       - PUBLIC_OPPWA_URL=https://eu-prod.oppwa.com
     restart: unless-stopped
     healthcheck:
