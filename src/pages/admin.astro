@@ -56,7 +56,7 @@ import Layout from "../layouts/Layout.astro";
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       const adminToken = localStorage.getItem("animus-admin-token");
-      if (adminToken === "damian_authenticated") {
+      if (adminToken === "admin_authenticated") {
         window.location.href = "/admin/dashboard";
       }
     });
@@ -81,9 +81,9 @@ import Layout from "../layouts/Layout.astro";
 
         errorDiv.classList.add("hidden");
 
-        if (username === "damian" && password === "12345") {
-          localStorage.setItem("animus-admin-token", "damian_authenticated");
-          localStorage.setItem("animus-admin-user", "damian");
+        if (username === "admin" && password === "passanimus2025@") {
+          localStorage.setItem("animus-admin-token", "admin_authenticated");
+          localStorage.setItem("animus-admin-user", "admin");
           localStorage.setItem(
             "animus-admin-login-time",
             new Date().getTime().toString()

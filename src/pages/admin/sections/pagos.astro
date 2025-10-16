@@ -404,9 +404,9 @@ import Modal from "../../../components/Modal.astro";
 
       if (
         !adminToken ||
-        adminToken !== "damian_authenticated" ||
+        adminToken !== "admin_authenticated" ||
         !adminUser ||
-        adminUser !== "damian"
+        adminUser !== "admin"
       ) {
         window.location.href = "/admin";
         return;
