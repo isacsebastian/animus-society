@@ -2,6 +2,7 @@
 import Layout from "../../../layouts/Layout.astro";
 import Modal from "../../../components/Modal.astro";
 import PaymentDetailModal from "../../../components/PaymentDetailModal.astro";
+import Notification from "../../../components/Notification.astro";
 ---
 
 <Layout
@@ -170,7 +171,19 @@ import PaymentDetailModal from "../../../components/PaymentDetailModal.astro";
     isDangerous={true}
   />
 
+  <Modal
+    id="cancel-subscription-modal"
+    title="Cancelar Suscripción"
+    message="¿Estás seguro de que deseas cancelar esta suscripción?"
+    confirmText="Sí, Cancelar Suscripción"
+    cancelText="No, Mantener Activa"
+    confirmAction="cancelSubscription"
+    isDangerous={true}
+  />
+
   <PaymentDetailModal id="payment-detail-modal" />
+
+  <Notification />
 
   <script>
     import {
@@ -216,6 +229,16 @@ import PaymentDetailModal from "../../../components/PaymentDetailModal.astro";
       // Cargar datos iniciales
       loadStats();
       loadPayments();
+
+      // Escuchar evento de cancelación de suscripción
+      window.addEventListener("cancelSubscription", async (e: any) => {
+        const subscriptionId = (window as any).currentSubscriptionId;
+        const customerName = (window as any).currentCustomerName;
+
+        if (!subscriptionId) return;
+
+        await cancelSubscriptionAction(subscriptionId, customerName);
+      });
     });
 
     // Logout
@@ -225,6 +248,74 @@ import PaymentDetailModal from "../../../components/PaymentDetailModal.astro";
         e.preventDefault();
         (window as any).showModal("logout-modal");
       });
+    }
+
+    // Función para ejecutar la cancelación de suscripción
+    async function cancelSubscriptionAction(
+      subscriptionId: string,
+      customerName: string
+    ) {
+      try {
+        const { cancelSubscription } = await import(
+          "../../../lib/history-payments"
+        );
+
+        // Cerrar el modal de confirmación
+        (window as any).hideModal("cancel-subscription-modal");
+
+        // Mostrar loading en el modal de detalles
+        const modal = document.getElementById("payment-detail-modal");
+        if (modal) {
+          const contentDiv = modal.querySelector('[id$="-content"]');
+          if (contentDiv) {
+            contentDiv.innerHTML = `
+              <div class="flex flex-col items-center justify-center py-12">
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#6D4AEB] mb-4"></div>
+                <p class="text-gray-600 font-medium">Cancelando suscripción de ${customerName}...</p>
+              </div>
+            `;
+
+            try {
+              await cancelSubscription(subscriptionId);
+
+              // Cerrar modal de detalles
+              (window as any).closePaymentDetailModal("payment-detail-modal");
+
+              // Mostrar notificación de éxito
+              if (typeof (window as any).showNotification === "function") {
+                (window as any).showNotification(
+                  `Suscripción de ${customerName} cancelada exitosamente. No se realizarán más cobros automáticos.`,
+                  "success"
+                );
+              }
+
+              // Refrescar estadísticas y tabla
+              await loadStats();
+              await loadPayments(currentPage);
+
+              // Limpiar variables globales
+              (window as any).currentSubscriptionId = null;
+              (window as any).currentCustomerName = null;
+            } catch (error) {
+              // Cerrar modal de detalles
+              (window as any).closePaymentDetailModal("payment-detail-modal");
+
+              // Mostrar notificación de error
+              const errorMessage =
+                error instanceof Error
+                  ? error.message
+                  : "Error al cancelar la suscripción. Por favor, intenta de nuevo.";
+
+              if (typeof (window as any).showNotification === "function") {
+                (window as any).showNotification(`❌ ${errorMessage}`, "error");
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error al cancelar suscripción:", error);
+        alert("Error al cancelar la suscripción. Por favor, intenta de nuevo.");
+      }
     }
 
     // Cargar estadísticas

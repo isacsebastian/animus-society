@@ -129,3 +129,19 @@ export async function getPaymentDetail(paymentId: string): Promise<PaymentDetail
 
   return response.json();
 }
+
+export async function cancelSubscription(subscriptionId: string): Promise<{ message: string }> {
+  const response = await fetch(`${BACKEND}/api/payments/subscriptions/${subscriptionId}/cancel`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Error al cancelar la suscripción');
+  }
+
+  return response.json();
+}
