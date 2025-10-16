@@ -1,6 +1,7 @@
 ---
 import Layout from "../../../layouts/Layout.astro";
 import Modal from "../../../components/Modal.astro";
+import PaymentDetailModal from "../../../components/PaymentDetailModal.astro";
 ---
 
 <Layout
@@ -49,106 +50,13 @@ import Modal from "../../../components/Modal.astro";
         </button>
       </div>
 
-      <div class="grid md:grid-cols-4 gap-6 mb-8">
-        <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
-          <div class="flex items-center gap-3 mb-2">
-            <div
-              class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center"
-            >
-              <svg
-                class="w-6 h-6 text-green-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"
-                ></path>
-              </svg>
-            </div>
-            <div>
-              <h3 class="text-sm font-medium text-gray-600">Ingresos Total</h3>
-              <p class="text-2xl font-bold text-green-600">$45,678</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
-          <div class="flex items-center gap-3 mb-2">
-            <div
-              class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center"
-            >
-              <svg
-                class="w-6 h-6 text-blue-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                ></path>
-              </svg>
-            </div>
-            <div>
-              <h3 class="text-sm font-medium text-gray-600">Pagos Exitosos</h3>
-              <p class="text-2xl font-bold text-blue-600">1,456</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
-          <div class="flex items-center gap-3 mb-2">
-            <div
-              class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center"
-            >
-              <svg
-                class="w-6 h-6 text-yellow-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-            <div>
-              <h3 class="text-sm font-medium text-gray-600">Pendientes</h3>
-              <p class="text-2xl font-bold text-yellow-600">23</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
-          <div class="flex items-center gap-3 mb-2">
-            <div
-              class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center"
-            >
-              <svg
-                class="w-6 h-6 text-red-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </div>
-            <div>
-              <h3 class="text-sm font-medium text-gray-600">Fallidos</h3>
-              <p class="text-2xl font-bold text-red-600">12</p>
-            </div>
+      <!-- Estadísticas -->
+      <div id="stats-container" class="grid md:grid-cols-4 gap-6 mb-8">
+        <!-- Loading state -->
+        <div class="col-span-4 flex justify-center py-8">
+          <div
+            class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#6D4AEB]"
+          >
           </div>
         </div>
       </div>
@@ -156,31 +64,35 @@ import Modal from "../../../components/Modal.astro";
       <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
         <div class="mb-6 flex flex-wrap gap-4">
           <input
+            id="searchInput"
             type="search"
-            placeholder="Buscar por usuario, ID de pago o referencia..."
+            placeholder="Buscar por nombre, cédula, email o ID..."
             class="flex-1 min-w-[250px] px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D4AEB] focus:border-transparent text-black placeholder-gray-500"
           />
-          <input
-            type="date"
-            class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D4AEB] text-black"
-          />
           <select
+            id="statusFilter"
             class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D4AEB] text-black"
           >
             <option value="todos">Todos los estados</option>
-            <option value="completado">Completados</option>
-            <option value="pendiente">Pendientes</option>
-            <option value="fallido">Fallidos</option>
+            <option value="APPROVED">Aprobados</option>
+            <option value="PENDING">Pendientes</option>
+            <option value="REJECTED">Rechazados</option>
+            <option value="FAILED">Fallidos</option>
+          </select>
+          <select
+            id="typeFilter"
+            class="px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6D4AEB] text-black"
+          >
+            <option value="todos">Todos los tipos</option>
+            <option value="ONE_TIME">Pago Único</option>
+            <option value="INITIAL">Pago Inicial</option>
+            <option value="RECURRING">Pago Recurrente</option>
           </select>
           <button
+            id="filterBtn"
             class="px-6 py-3 bg-[#6D4AEB] text-white rounded-lg hover:bg-[#5A3CC7] transition-colors font-medium"
           >
             Filtrar
-          </button>
-          <button
-            class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
-          >
-            Exportar CSV
           </button>
         </div>
 
@@ -193,22 +105,17 @@ import Modal from "../../../components/Modal.astro";
                 <th
                   class="border border-gray-200 px-4 py-3 text-left text-black font-semibold"
                 >
-                  ID Transacción
+                  Nombre del Cliente
                 </th>
                 <th
                   class="border border-gray-200 px-4 py-3 text-left text-black font-semibold"
                 >
-                  Usuario
+                  Cédula
                 </th>
                 <th
                   class="border border-gray-200 px-4 py-3 text-left text-black font-semibold"
                 >
-                  Plan
-                </th>
-                <th
-                  class="border border-gray-200 px-4 py-3 text-left text-black font-semibold"
-                >
-                  Método de Pago
+                  Tipo de Pago
                 </th>
                 <th
                   class="border border-gray-200 px-4 py-3 text-left text-black font-semibold"
@@ -226,162 +133,28 @@ import Modal from "../../../components/Modal.astro";
                   Estado
                 </th>
                 <th
-                  class="border border-gray-200 px-4 py-3 text-left text-black font-semibold"
+                  class="border border-gray-200 px-4 py-3 text-center text-black font-semibold"
                 >
-                  Acciones
+                  Ver
                 </th>
               </tr>
             </thead>
-            <tbody>
-              <tr>
-                <td
-                  class="border border-gray-200 px-4 py-3 text-gray-700 font-mono text-sm"
-                >
-                  TXN_001567
-                </td>
-                <td class="border border-gray-200 px-4 py-3 text-gray-700">
-                  juan.perez@email.com
-                </td>
-                <td class="border border-gray-200 px-4 py-3">
-                  <span
-                    class="bg-[#6D4AEB]/10 text-[#6D4AEB] px-2 py-1 rounded text-sm font-medium"
-                  >
-                    Plan Premium
-                  </span>
-                </td>
-                <td class="border border-gray-200 px-4 py-3 text-gray-700">
-                  Tarjeta de Crédito
-                </td>
-                <td
-                  class="border border-gray-200 px-4 py-3 text-gray-700 font-semibold"
-                >
-                  $29.99
-                </td>
-                <td class="border border-gray-200 px-4 py-3 text-gray-700">
-                  2025-09-22 14:30
-                </td>
-                <td class="border border-gray-200 px-4 py-3">
-                  <span
-                    class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm"
-                  >
-                    Completado
-                  </span>
-                </td>
-                <td class="border border-gray-200 px-4 py-3">
-                  <div class="flex gap-2">
-                    <button
-                      class="text-[#6D4AEB] hover:text-[#5A3CC7] text-sm font-medium"
-                    >
-                      Ver Detalles
-                    </button>
-                    <button
-                      class="text-blue-600 hover:text-blue-700 text-sm font-medium"
-                    >
-                      Recibo
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td
-                  class="border border-gray-200 px-4 py-3 text-gray-700 font-mono text-sm"
-                >
-                  TXN_001566
-                </td>
-                <td class="border border-gray-200 px-4 py-3 text-gray-700">
-                  maria.garcia@email.com
-                </td>
-                <td class="border border-gray-200 px-4 py-3">
-                  <span
-                    class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-sm font-medium"
-                  >
-                    Plan Básico
-                  </span>
-                </td>
-                <td class="border border-gray-200 px-4 py-3 text-gray-700">
-                  PayPal
-                </td>
-                <td
-                  class="border border-gray-200 px-4 py-3 text-gray-700 font-semibold"
-                >
-                  $19.99
-                </td>
-                <td class="border border-gray-200 px-4 py-3 text-gray-700">
-                  2025-09-21 16:45
-                </td>
-                <td class="border border-gray-200 px-4 py-3">
-                  <span
-                    class="bg-yellow-100 text-yellow-800 px-2 py-1 rounded text-sm"
-                  >
-                    Pendiente
-                  </span>
-                </td>
-                <td class="border border-gray-200 px-4 py-3">
-                  <div class="flex gap-2">
-                    <button
-                      class="text-orange-600 hover:text-orange-700 text-sm font-medium"
-                    >
-                      Procesar
-                    </button>
-                    <button
-                      class="text-[#6D4AEB] hover:text-[#5A3CC7] text-sm font-medium"
-                    >
-                      Ver Detalles
-                    </button>
-                  </div>
-                </td>
-              </tr>
-              <tr>
-                <td
-                  class="border border-gray-200 px-4 py-3 text-gray-700 font-mono text-sm"
-                >
-                  TXN_001565
-                </td>
-                <td class="border border-gray-200 px-4 py-3 text-gray-700">
-                  carlos.rodriguez@email.com
-                </td>
-                <td class="border border-gray-200 px-4 py-3">
-                  <span
-                    class="bg-[#6D4AEB]/10 text-[#6D4AEB] px-2 py-1 rounded text-sm font-medium"
-                  >
-                    Plan Premium
-                  </span>
-                </td>
-                <td class="border border-gray-200 px-4 py-3 text-gray-700">
-                  Transferencia
-                </td>
-                <td
-                  class="border border-gray-200 px-4 py-3 text-gray-700 font-semibold"
-                >
-                  $29.99
-                </td>
-                <td class="border border-gray-200 px-4 py-3 text-gray-700">
-                  2025-09-20 09:15
-                </td>
-                <td class="border border-gray-200 px-4 py-3">
-                  <span
-                    class="bg-red-100 text-red-800 px-2 py-1 rounded text-sm"
-                  >
-                    Fallido
-                  </span>
-                </td>
-                <td class="border border-gray-200 px-4 py-3">
-                  <div class="flex gap-2">
-                    <button
-                      class="text-green-600 hover:text-green-700 text-sm font-medium"
-                    >
-                      Reintentar
-                    </button>
-                    <button
-                      class="text-[#6D4AEB] hover:text-[#5A3CC7] text-sm font-medium"
-                    >
-                      Ver Error
-                    </button>
-                  </div>
-                </td>
-              </tr>
+            <tbody id="paymentsTableBody">
+              <!-- Datos cargados dinámicamente -->
             </tbody>
           </table>
+        </div>
+
+        <!-- Paginación -->
+        <div id="pagination" class="mt-6 flex justify-between items-center">
+          <div class="text-sm text-gray-600">
+            Mostrando <span id="showingFrom">0</span> a <span id="showingTo"
+              >0</span
+            > de <span id="totalRecords">0</span> registros
+          </div>
+          <div id="paginationButtons" class="flex gap-2">
+            <!-- Botones de paginación generados dinámicamente -->
+          </div>
         </div>
       </div>
     </div>
@@ -397,7 +170,20 @@ import Modal from "../../../components/Modal.astro";
     isDangerous={true}
   />
 
+  <PaymentDetailModal id="payment-detail-modal" />
+
   <script>
+    import {
+      getPaymentHistory,
+      getPaymentStats,
+    } from "../../../lib/history-payments";
+    import type { PaymentHistoryItem } from "../../../lib/history-payments";
+
+    // Variables de estado
+    let currentPage = 1;
+    const pageSize = 10;
+
+    // Verificar autenticación
     document.addEventListener("DOMContentLoaded", function () {
       const adminToken = localStorage.getItem("animus-admin-token");
       const adminUser = localStorage.getItem("animus-admin-user");
@@ -426,13 +212,330 @@ import Modal from "../../../components/Modal.astro";
           return;
         }
       }
+
+      // Cargar datos iniciales
+      loadStats();
+      loadPayments();
     });
 
+    // Logout
     const logoutBtn = document.getElementById("logoutBtn");
     if (logoutBtn) {
       logoutBtn.addEventListener("click", function (e) {
         e.preventDefault();
         (window as any).showModal("logout-modal");
+      });
+    }
+
+    // Cargar estadísticas
+    async function loadStats() {
+      try {
+        const stats = await getPaymentStats();
+        const statsContainer = document.getElementById("stats-container");
+        if (!statsContainer) return;
+
+        statsContainer.innerHTML = `
+          <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-sm font-medium text-gray-600">Ingresos Total</h3>
+                <p class="text-2xl font-bold text-green-600">$${stats.totalRevenue.toFixed(2)}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-sm font-medium text-gray-600">Pagos Exitosos</h3>
+                <p class="text-2xl font-bold text-blue-600">${stats.successfulPayments}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-sm font-medium text-gray-600">Pendientes</h3>
+                <p class="text-2xl font-bold text-yellow-600">${stats.pendingPayments}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-gray-50 rounded-lg p-6 border border-gray-200">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-sm font-medium text-gray-600">Fallidos</h3>
+                <p class="text-2xl font-bold text-red-600">${stats.failedPayments}</p>
+              </div>
+            </div>
+          </div>
+        `;
+      } catch (error) {
+        console.error("Error al cargar estadísticas:", error);
+      }
+    }
+
+    // Cargar pagos
+    async function loadPayments(page: number = 1) {
+      const searchInput = document.getElementById(
+        "searchInput"
+      ) as HTMLInputElement;
+      const statusFilter = document.getElementById(
+        "statusFilter"
+      ) as HTMLSelectElement;
+      const typeFilter = document.getElementById(
+        "typeFilter"
+      ) as HTMLSelectElement;
+      const tbody = document.getElementById("paymentsTableBody");
+
+      if (!tbody) return;
+
+      // Mostrar loading
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="7" class="border border-gray-200 px-4 py-12 text-center">
+            <div class="flex justify-center">
+              <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-[#6D4AEB]"></div>
+            </div>
+          </td>
+        </tr>
+      `;
+
+      try {
+        const search = searchInput?.value || undefined;
+        const status =
+          statusFilter?.value !== "todos" ? statusFilter?.value : undefined;
+        const paymentType =
+          typeFilter?.value !== "todos" ? typeFilter?.value : undefined;
+
+        const response = await getPaymentHistory(
+          page,
+          pageSize,
+          status,
+          paymentType,
+          search
+        );
+
+        if (response.data.length === 0) {
+          tbody.innerHTML = `
+            <tr>
+              <td colspan="7" class="border border-gray-200 px-4 py-12 text-center text-gray-600">
+                No se encontraron pagos
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        // Mapear tipos de pago
+        const paymentTypeMap: Record<string, { text: string; color: string }> =
+          {
+            ONE_TIME: {
+              text: "Pago Único",
+              color: "bg-purple-100 text-purple-800",
+            },
+            RECURRING: {
+              text: "Recurrente",
+              color: "bg-blue-100 text-blue-800",
+            },
+            INITIAL: {
+              text: "Inicial",
+              color: "bg-[#6D4AEB]/10 text-[#6D4AEB]",
+            },
+          };
+
+        // Mapear estados
+        const statusMap: Record<string, { text: string; color: string }> = {
+          APPROVED: { text: "Aprobado", color: "bg-green-100 text-green-800" },
+          PENDING: {
+            text: "Pendiente",
+            color: "bg-yellow-100 text-yellow-800",
+          },
+          REJECTED: { text: "Rechazado", color: "bg-red-100 text-red-800" },
+          FAILED: { text: "Fallido", color: "bg-red-100 text-red-800" },
+          CANCELLED: { text: "Cancelado", color: "bg-gray-100 text-gray-800" },
+        };
+
+        tbody.innerHTML = response.data
+          .map((payment: PaymentHistoryItem) => {
+            const paymentTypeInfo = paymentTypeMap[payment.paymentType] || {
+              text: payment.paymentType,
+              color: "bg-gray-100 text-gray-800",
+            };
+            const statusInfo = statusMap[payment.status] || {
+              text: payment.status,
+              color: "bg-gray-100 text-gray-800",
+            };
+            const date = new Date(payment.createdAt);
+
+            return `
+            <tr class="hover:bg-gray-50 transition-colors">
+              <td class="border border-gray-200 px-4 py-3 text-gray-900 font-medium">
+                ${payment.customerName}
+              </td>
+              <td class="border border-gray-200 px-4 py-3 text-gray-700 font-mono text-sm">
+                ${payment.customerIdentification}
+              </td>
+              <td class="border border-gray-200 px-4 py-3">
+                <span class="inline-block px-2 py-1 rounded text-sm font-medium ${paymentTypeInfo.color}">
+                  ${paymentTypeInfo.text}
+                </span>
+              </td>
+              <td class="border border-gray-200 px-4 py-3 text-gray-900 font-semibold">
+                ${payment.currency} $${payment.amount.toFixed(2)}
+              </td>
+              <td class="border border-gray-200 px-4 py-3 text-gray-700 text-sm">
+                ${date.toLocaleDateString("es-EC", { year: "numeric", month: "short", day: "numeric" })}<br/>
+                <span class="text-gray-500">${date.toLocaleTimeString("es-EC", { hour: "2-digit", minute: "2-digit" })}</span>
+              </td>
+              <td class="border border-gray-200 px-4 py-3">
+                <span class="inline-block px-2 py-1 rounded text-sm font-medium ${statusInfo.color}">
+                  ${statusInfo.text}
+                </span>
+              </td>
+              <td class="border border-gray-200 px-4 py-3 text-center">
+                <button
+                  onclick="openPaymentDetailModal('payment-detail-modal', '${payment.id}')"
+                  class="text-[#6D4AEB] hover:text-[#5A3CC7] transition-colors"
+                  title="Ver detalles"
+                >
+                  <svg class="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          `;
+          })
+          .join("");
+
+        // Actualizar paginación
+        updatePagination(response);
+      } catch (error) {
+        console.error("Error al cargar pagos:", error);
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="border border-gray-200 px-4 py-12 text-center text-red-600">
+              Error al cargar los pagos. Por favor, intenta de nuevo.
+            </td>
+          </tr>
+        `;
+      }
+    }
+
+    // Actualizar paginación
+    function updatePagination(response: any) {
+      const showingFrom = document.getElementById("showingFrom");
+      const showingTo = document.getElementById("showingTo");
+      const totalRecords = document.getElementById("totalRecords");
+      const paginationButtons = document.getElementById("paginationButtons");
+
+      if (!showingFrom || !showingTo || !totalRecords || !paginationButtons)
+        return;
+
+      const from = (response.page - 1) * response.pageSize + 1;
+      const to = Math.min(response.page * response.pageSize, response.total);
+
+      showingFrom.textContent = from.toString();
+      showingTo.textContent = to.toString();
+      totalRecords.textContent = response.total.toString();
+
+      // Generar botones de paginación
+      const buttons: string[] = [];
+
+      // Botón anterior
+      if (response.page > 1) {
+        buttons.push(`
+          <button
+            onclick="changePage(${response.page - 1})"
+            class="px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
+          >
+            Anterior
+          </button>
+        `);
+      }
+
+      // Botones de páginas
+      for (let i = 1; i <= response.totalPages; i++) {
+        if (
+          i === 1 ||
+          i === response.totalPages ||
+          (i >= response.page - 2 && i <= response.page + 2)
+        ) {
+          const isActive = i === response.page;
+          buttons.push(`
+            <button
+              onclick="changePage(${i})"
+              class="px-3 py-2 ${isActive ? "bg-[#6D4AEB] text-white" : "bg-white text-gray-700"} border border-gray-300 rounded-lg hover:bg-${isActive ? "[#5A3CC7]" : "gray-50"} transition-colors"
+            >
+              ${i}
+            </button>
+          `);
+        } else if (i === response.page - 3 || i === response.page + 3) {
+          buttons.push('<span class="px-2 text-gray-500">...</span>');
+        }
+      }
+
+      // Botón siguiente
+      if (response.page < response.totalPages) {
+        buttons.push(`
+          <button
+            onclick="changePage(${response.page + 1})"
+            class="px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-gray-700"
+          >
+            Siguiente
+          </button>
+        `);
+      }
+
+      paginationButtons.innerHTML = buttons.join("");
+    }
+
+    // Cambiar página
+    (window as any).changePage = (page: number) => {
+      currentPage = page;
+      loadPayments(page);
+    };
+
+    // Filtrar
+    const filterBtn = document.getElementById("filterBtn");
+    if (filterBtn) {
+      filterBtn.addEventListener("click", () => {
+        currentPage = 1;
+        loadPayments(1);
+      });
+    }
+
+    // Buscar al presionar Enter
+    const searchInput = document.getElementById("searchInput");
+    if (searchInput) {
+      searchInput.addEventListener("keypress", (e: any) => {
+        if (e.key === "Enter") {
+          currentPage = 1;
+          loadPayments(1);
+        }
       });
     }
   </script>
