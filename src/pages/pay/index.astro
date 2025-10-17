@@ -1378,7 +1378,15 @@ const genId = () => {
           } else {
             planType = isGymPlan ? "GYM_MONTHLY" : "APP_MONTHLY";
           }
-          const subscriptionPayload = { ...basePayload, planType };
+          
+          // Generar returnUrl absoluta para el backend
+          const returnUrl = `${window.location.origin}/payment-success`;
+          
+          const subscriptionPayload = { 
+            ...basePayload, 
+            planType,
+            returnUrl 
+          };
 
           log("Payload de suscripción:");
           log(subscriptionPayload);
