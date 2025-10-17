@@ -37,7 +37,7 @@ const { title, description } = Astro.props as Props;
       body {
         font-family: "Poppins", sans-serif;
         height: 100%;
-        overflow: hidden;
+        overflow-y: auto;
       }
 
       body {
@@ -132,12 +132,12 @@ const { title, description } = Astro.props as Props;
       }
     </style>
   </head>
-  <body class="text-slate-100 antialiased h-full">
+  <body class="text-slate-100 antialiased">
     <div class="fondo_grande"></div>
     <div class="bg-image"></div>
     <div class="grid-overlay"></div>
 
-    <main class="relative h-full overflow-hidden">
+    <main class="relative min-h-screen">
       <slot />
     </main>
     <script type="text/javascript" src="/api/datafast-script" async defer onerror="console.warn('DataFast script failed to load')"></script>
