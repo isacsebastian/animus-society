@@ -1314,12 +1314,6 @@ const genId = () => {
         return;
       }
 
-      if (!selectedPlan.value.includes("test") && parseFloat(amount) > 50) {
-        log("En sandbox, amount ≤ 50.00", "err");
-        alert("En el ambiente de pruebas, el monto debe ser ≤ $50.00");
-        return;
-      }
-
       const planValue = selectedPlan.value;
       const isMonthlyPlan = planValue.includes("monthly");
       const isGymPlan = planValue.includes("gym");
