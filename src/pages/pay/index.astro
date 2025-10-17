@@ -1133,10 +1133,27 @@ const genId = () => {
     const mount = document.getElementById("widget-mount");
     if (!mount) return;
 
-    const callbackUrl =
-      isSubscription && subscriptionData
-        ? `${BACKEND}/api/payments/json-response?type=subscription&customerId=${subscriptionData.customerId}&planType=${subscriptionData.planType}`
-        : `${BACKEND}/api/payments/json-response?type=onetime`;
+    // Asegurar que el callbackUrl sea una URL absoluta completa
+    const getAbsoluteUrl = (path) => {
+      // Si ya es una URL absoluta, devolverla tal cual
+      if (path.startsWith('http://') || path.startsWith('https://')) {
+        return path;
+      }
+      // Si BACKEND es relativo, construir URL absoluta con el origen actual
+      if (BACKEND.startsWith('/') || !BACKEND.startsWith('http')) {
+        return `${window.location.origin}${path}`;
+      }
+      // Concatenar BACKEND con el path
+      return `${BACKEND}${path}`;
+    };
+
+    const callbackPath = isSubscription && subscriptionData
+      ? `/api/payments/json-response?type=subscription&customerId=${subscriptionData.customerId}&planType=${subscriptionData.planType}`
+      : `/api/payments/json-response?type=onetime`;
+
+    const callbackUrl = getAbsoluteUrl(callbackPath);
+
+    log(`Callback URL generada: ${callbackUrl}`, "ok");
 
     mount.innerHTML = "";
 
