@@ -68,33 +68,63 @@ export const GET: APIRoute = async ({ url, redirect }) => {
 
     console.log('[json-response proxy] Forwarding GET to:', endpoint);
 
-    const response = await fetch(endpoint, {
-      method: 'GET',
-      redirect: 'manual',
-    });
+    // Crear un AbortController para timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25 segundos timeout
 
-    console.log('[json-response proxy] Backend response status:', response.status);
-
-    // Si el backend devuelve un redirect
-    if (response.status >= 300 && response.status < 400) {
-      const location = response.headers.get('Location');
-      console.log('[json-response proxy] Redirecting to:', location);
+    try {
+      const response = await fetch(endpoint, {
+        method: 'GET',
+        redirect: 'manual',
+        signal: controller.signal,
+      });
       
-      if (location) {
-        return redirect(location, 302);
+      clearTimeout(timeoutId);
+
+      console.log('[json-response proxy] Backend response status:', response.status);
+
+      // Si el backend devuelve un redirect
+      if (response.status >= 300 && response.status < 400) {
+        const location = response.headers.get('Location');
+        console.log('[json-response proxy] Redirecting to:', location);
+        
+        if (location) {
+          return redirect(location, 302);
+        }
       }
+
+      const data = await response.text();
+
+      return new Response(data, {
+        status: response.status,
+        headers: {
+          'Content-Type': response.headers.get('Content-Type') || 'application/json',
+        },
+      });
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+      
+      // Si es abort/timeout, crear respuesta PENDING
+      if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+        console.error('[json-response proxy] Timeout en GET request');
+        
+        const errorData = {
+          error: true,
+          success: false,
+          status: 'PENDING',
+          message: 'El procesamiento del pago está tardando más de lo esperado. Verificaremos el estado automáticamente.',
+        };
+        
+        const encodedData = encodeURIComponent(JSON.stringify(errorData));
+        const errorUrl = `/payment-success?payment=${encodedData}`;
+        
+        return redirect(errorUrl, 302);
+      }
+      
+      throw fetchError; // Re-lanzar otros errores
     }
-
-    const data = await response.text();
-
-    return new Response(data, {
-      status: response.status,
-      headers: {
-        'Content-Type': response.headers.get('Content-Type') || 'application/json',
-      },
-    });
   } catch (error) {
-    console.error('[json-response proxy] Error:', error);
+    console.error('[json-response proxy] Error general:', error);
     
     const errorData = {
       error: true,

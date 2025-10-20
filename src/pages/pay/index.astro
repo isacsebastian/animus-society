@@ -660,7 +660,7 @@ const genId = () => {
 
               <div class="space-y-4 mt-6">
                 <input type="hidden" id="amount" name="amount" value="77.00" />
-                
+
                 <!-- Campo oculto pero funcional: ID de Transacción -->
                 <input
                   type="hidden"
@@ -1101,20 +1101,21 @@ const genId = () => {
     // Asegurar que el callbackUrl sea una URL absoluta completa
     const getAbsoluteUrl = (path) => {
       // Si ya es una URL absoluta, devolverla tal cual
-      if (path.startsWith('http://') || path.startsWith('https://')) {
+      if (path.startsWith("http://") || path.startsWith("https://")) {
         return path;
       }
       // Si BACKEND es relativo, construir URL absoluta con el origen actual
-      if (BACKEND.startsWith('/') || !BACKEND.startsWith('http')) {
+      if (BACKEND.startsWith("/") || !BACKEND.startsWith("http")) {
         return `${window.location.origin}${path}`;
       }
       // Concatenar BACKEND con el path
       return `${BACKEND}${path}`;
     };
 
-    const callbackPath = isSubscription && subscriptionData
-      ? `/api/payments/json-response?type=subscription&customerId=${subscriptionData.customerId}&planType=${subscriptionData.planType}`
-      : `/api/payments/json-response?type=onetime`;
+    const callbackPath =
+      isSubscription && subscriptionData
+        ? `/api/payments/json-response?type=subscription&customerId=${subscriptionData.customerId}&planType=${subscriptionData.planType}`
+        : `/api/payments/json-response?type=onetime`;
 
     const callbackUrl = getAbsoluteUrl(callbackPath);
 
@@ -1343,14 +1344,14 @@ const genId = () => {
           } else {
             planType = isGymPlan ? "GYM_MONTHLY" : "APP_MONTHLY";
           }
-          
+
           // Generar returnUrl absoluta para el backend
           const returnUrl = `${window.location.origin}/payment-success`;
-          
-          const subscriptionPayload = { 
-            ...basePayload, 
+
+          const subscriptionPayload = {
+            ...basePayload,
             planType,
-            returnUrl 
+            returnUrl,
           };
 
           log("Payload de suscripción:");
