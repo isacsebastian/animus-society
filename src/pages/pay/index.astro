@@ -1110,9 +1110,7 @@ const genId = () => {
 
     log("Widget configurado - el backend manejará la redirección final", "ok");
 
-    // Variable para controlar que solo se haga UNA redirección
-    let redirected = false;
-    
+    // ✅ SOLUCIÓN DEFINITIVA: NO interceptar nada, dejar que el widget funcione solo
     window.wpwlOptions = {
       style: "card",
       locale: "es",
@@ -1120,17 +1118,6 @@ const genId = () => {
         cvv: "Código de verificación",
         cardHolder: "Nombre (Igual que en la tarjeta)",
         registerCard: "Guardar información de tarjeta para pagos futuros",
-      },
-      onBeforeRedirect: function(data) {
-        // ✅ SOLUCIÓN: Interceptar ANTES de la redirección
-        // y asegurar que solo se haga UNA VEZ
-        if (!redirected) {
-          redirected = true;
-          log("Pago completado - redirigiendo al backend UNA VEZ...", "ok");
-          return true; // Permitir la redirección del widget
-        }
-        log("Redirección ya realizada - ignorando duplicado", "warn");
-        return false; // Bloquear redirecciones adicionales
       },
       onReady: function () {
         const form = document.querySelector(
