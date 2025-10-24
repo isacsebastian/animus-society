@@ -459,7 +459,8 @@ const genId = () => {
                       <div class="flex-1">
                         <h4 class="font-medium text-gray-900">Animus Flow</h4>
                         <p class="text-sm text-gray-600">
-                          Empieza tu transformación hoy mismo y mantén el ritmo cada día
+                          Empieza tu transformación hoy mismo y mantén el ritmo
+                          cada día
                         </p>
                       </div>
                       <div class="text-right">
@@ -490,7 +491,9 @@ const genId = () => {
                       </span>
                       <div class="flex-1">
                         <h4 class="font-medium text-gray-900">Animus Legacy</h4>
-                        <p class="text-sm text-gray-600">Ahorra $125 y eleva tu rendimiento durante todo el año</p>
+                        <p class="text-sm text-gray-600">
+                          Ahorra $125 y eleva tu rendimiento durante todo el año
+                        </p>
                       </div>
                       <div class="text-right">
                         <span class="text-2xl font-bold text-gray-900"
@@ -523,7 +526,8 @@ const genId = () => {
                           Animus Flow Online
                         </h4>
                         <p class="text-sm text-gray-600">
-                          Empieza tu transformación hoy mismo y mantén el ritmo cada día
+                          Empieza tu transformación hoy mismo y mantén el ritmo
+                          cada día
                         </p>
                       </div>
                       <div class="text-right">
@@ -557,7 +561,9 @@ const genId = () => {
                         <h4 class="font-medium text-gray-900">
                           Animus Legacy Online
                         </h4>
-                        <p class="text-sm text-gray-600">Ahorra $40 y eleva tu rendimiento durante todo el año</p>
+                        <p class="text-sm text-gray-600">
+                          Ahorra $40 y eleva tu rendimiento durante todo el año
+                        </p>
                       </div>
                       <div class="text-right">
                         <span class="text-2xl font-bold text-gray-900"
@@ -1098,20 +1104,21 @@ const genId = () => {
 
     const prevScript = document.getElementById("oppwa-script");
     if (prevScript) prevScript.remove();
-    
+
     // ✅ FLUJO CORRECTO:
-    // 1. Widget intercepta con onBeforeRedirect
-    // 2. Llama backend en segundo plano para guardar pago
-    // 3. Redirige INMEDIATAMENTE a /payment-processing
-    // 4. Usuario ve página bonita sin errores 502
+    // 1. Widget completa pago y redirige a data-shopper-result-url
+    // 2. Proxy /api/payments/json-response intercepta
+    // 3. Proxy llama backend en segundo plano y redirige a /payment-processing
+    // 4. Usuario ve página bonita mientras backend procesa
     mount.innerHTML = `
       <form class="paymentWidgets"
-            data-brands="VISA MASTER AMEX DINERS DISCOVER">
+            data-brands="VISA MASTER AMEX DINERS DISCOVER"
+            data-shopper-result-url="${callbackUrl}">
       </form>`;
 
-    log("Widget configurado - redirigirá a /payment-processing", "ok");
+    log("Widget configurado - el proxy redirigirá a /payment-processing", "ok");
 
-    // ✅ SOLUCIÓN FINAL: NO esperar respuesta del backend, redirigir directo
+    // ✅ Configuración del widget
     window.wpwlOptions = {
       style: "card",
       locale: "es",
@@ -1119,31 +1126,6 @@ const genId = () => {
         cvv: "Código de verificación",
         cardHolder: "Nombre (Igual que en la tarjeta)",
         registerCard: "Guardar información de tarjeta para pagos futuros",
-      },
-      onBeforeRedirect: function(data) {
-        // El widget quiere redirigir, interceptamos
-        log("Pago completado - redirigiendo a /payment-processing...", "ok");
-        
-        // Construir la URL del backend para llamarlo en segundo plano
-        const backendUrl = new URL(callbackUrl);
-        if (data && data.id) {
-          backendUrl.searchParams.set('id', data.id);
-          backendUrl.searchParams.set('resourcePath', `/v1/checkouts/${data.id}/payment`);
-        }
-        
-        // Llamar al backend en segundo plano (sin esperar respuesta)
-        fetch(backendUrl.toString(), {
-          method: 'GET',
-          mode: 'no-cors' // No nos importa la respuesta
-        }).catch(err => {
-          console.log('Error en background fetch (ignorado):', err);
-        });
-        
-        // Redirigir INMEDIATAMENTE a payment-processing
-        window.location.href = '/payment-processing';
-        
-        // Prevenir la redirección automática del widget
-        return false;
       },
       onReady: function () {
         const form = document.querySelector(
