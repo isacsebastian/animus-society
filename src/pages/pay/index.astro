@@ -1092,7 +1092,7 @@ const genId = () => {
     const callbackUrl = getAbsoluteUrl(callbackPath);
 
     log(`Callback URL: ${callbackUrl}`, "ok");
-    log("El backend procesará y redirigirá a /payment-processing", "ok");
+    log("El backend redirigirá a /payment-success con los datos bonitos", "ok");
 
     mount.innerHTML = "";
 
@@ -1101,16 +1101,14 @@ const genId = () => {
     
     // ✅ FLUJO CORRECTO:
     // 1. Widget → Backend (callbackUrl) con resourcePath
-    // 2. Backend procesa y redirecciona SIEMPRE a /payment-processing
-    // 3. Usuario ve página bonita de "procesando"
-    // 4. Backend envía email con resultado final
+    // 2. Backend procesa y redirecciona a /payment-success?payment={datos}
     mount.innerHTML = `
       <form action="${callbackUrl}" class="paymentWidgets"
             data-brands="VISA MASTER AMEX DINERS DISCOVER"
             data-shopper-result-url="${callbackUrl}">
       </form>`;
 
-    log("Widget configurado - backend redirigirá a /payment-processing", "ok");
+    log("Widget configurado - el backend manejará la redirección final", "ok");
 
     // ✅ SOLUCIÓN DEFINITIVA: NO interceptar nada, dejar que el widget funcione solo
     window.wpwlOptions = {
