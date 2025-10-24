@@ -24,15 +24,15 @@ export const POST: APIRoute = async ({ request, url, redirect }) => {
 
     console.log('[json-response proxy] Backend response status:', response.status);
 
-    // ✅ SOLUCIÓN: SIEMPRE redirigir a /payment-processing
-    // Sin importar si el backend dice /payment-success o cualquier otra cosa
+    // Si el backend devuelve un redirect (302, 301, etc.)
     if (response.status >= 300 && response.status < 400) {
       const location = response.headers.get('Location');
-      console.log('[json-response proxy] Backend quería redirigir a:', location);
-      console.log('[json-response proxy] Redirigiendo a /payment-processing en su lugar');
+      console.log('[json-response proxy] Redirecting to:', location);
       
-      // SIEMPRE redirigir a payment-processing
-      return redirect('/payment-processing', 302);
+      if (location) {
+        // Hacer el redirect desde Astro (siempre usar 302)
+        return redirect(location, 302);
+      }
     }
 
     // Si no es redirect, devolver la respuesta tal cual
@@ -47,9 +47,17 @@ export const POST: APIRoute = async ({ request, url, redirect }) => {
   } catch (error) {
     console.error('[json-response proxy] Error:', error);
     
-    // ✅ En caso de error, también redirigir a payment-processing
-    console.log('[json-response proxy] Error capturado - redirigiendo a /payment-processing');
-    return redirect('/payment-processing', 302);
+    // En caso de error, redirigir a payment-success con error
+    const errorData = {
+      error: true,
+      success: false,
+      message: error instanceof Error ? error.message : 'Error procesando el pago',
+    };
+    
+    const encodedData = encodeURIComponent(JSON.stringify(errorData));
+    const errorUrl = `/payment-success?payment=${encodedData}`;
+    
+    return redirect(errorUrl, 302);
   }
 };
 
@@ -75,14 +83,14 @@ export const GET: APIRoute = async ({ url, redirect }) => {
 
       console.log('[json-response proxy] Backend response status:', response.status);
 
-      // ✅ SOLUCIÓN: SIEMPRE redirigir a /payment-processing
+      // Si el backend devuelve un redirect
       if (response.status >= 300 && response.status < 400) {
         const location = response.headers.get('Location');
-        console.log('[json-response proxy] Backend quería redirigir a:', location);
-        console.log('[json-response proxy] Redirigiendo a /payment-processing en su lugar');
+        console.log('[json-response proxy] Redirecting to:', location);
         
-        // SIEMPRE redirigir a payment-processing
-        return redirect('/payment-processing', 302);
+        if (location) {
+          return redirect(location, 302);
+        }
       }
 
       const data = await response.text();
@@ -96,11 +104,21 @@ export const GET: APIRoute = async ({ url, redirect }) => {
     } catch (fetchError) {
       clearTimeout(timeoutId);
       
-      // Si es abort/timeout, redirigir a payment-processing
+      // Si es abort/timeout, crear respuesta PENDING
       if (fetchError instanceof Error && fetchError.name === 'AbortError') {
         console.error('[json-response proxy] Timeout en GET request');
-        console.log('[json-response proxy] Redirigiendo a /payment-processing por timeout');
-        return redirect('/payment-processing', 302);
+        
+        const errorData = {
+          error: true,
+          success: false,
+          status: 'PENDING',
+          message: 'El procesamiento del pago está tardando más de lo esperado. Verificaremos el estado automáticamente.',
+        };
+        
+        const encodedData = encodeURIComponent(JSON.stringify(errorData));
+        const errorUrl = `/payment-success?payment=${encodedData}`;
+        
+        return redirect(errorUrl, 302);
       }
       
       throw fetchError; // Re-lanzar otros errores
@@ -108,8 +126,15 @@ export const GET: APIRoute = async ({ url, redirect }) => {
   } catch (error) {
     console.error('[json-response proxy] Error general:', error);
     
-    // ✅ En caso de error, redirigir a payment-processing
-    console.log('[json-response proxy] Error general - redirigiendo a /payment-processing');
-    return redirect('/payment-processing', 302);
+    const errorData = {
+      error: true,
+      success: false,
+      message: error instanceof Error ? error.message : 'Error procesando el pago',
+    };
+    
+    const encodedData = encodeURIComponent(JSON.stringify(errorData));
+    const errorUrl = `/payment-success?payment=${encodedData}`;
+    
+    return redirect(errorUrl, 302);
   }
 };
