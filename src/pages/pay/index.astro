@@ -1098,15 +1098,31 @@ const genId = () => {
     const prevScript = document.getElementById("oppwa-script");
     if (prevScript) prevScript.remove();
     
-    // ✅ SOLUCIÓN DEFINITIVA: Usar onReady para interceptar el submit
-    // En lugar de dejar que el formulario se envíe automáticamente,
-    // interceptamos el submit y redirigimos directamente
+    // ✅ FIX: Limpiar el formulario y crear uno nuevo
     mount.innerHTML = `
-      <form class="paymentWidgets"
-            data-brands="VISA MASTER AMEX DINERS DISCOVER">
+      <form action="${callbackUrl}" class="paymentWidgets"
+            data-brands="VISA MASTER AMEX DINERS DISCOVER"
+            data-shopper-result-url="${callbackUrl}">
       </form>`;
 
-    log("Widget configurado - submit será interceptado", "ok");
+    // ✅ IMPORTANTE: NO agregar event listeners adicionales
+    // El widget de OPPWA ya maneja automáticamente la redirección al callback URL
+    // después de que el pago sea procesado.
+    // 
+    // Agregar listeners como 'message', 'popstate', 'hashchange' causa que se hagan
+    // MÚLTIPLES llamadas al backend, resultando en error 502/400 porque el gateway
+    // ya no tiene la sesión del pago (expira después de la primera consulta).
+    //
+    // El flujo correcto es:
+    // 1. Usuario completa el pago en el widget
+    // 2. DataFast procesa el pago
+    // 3. Widget redirige automáticamente a: action="${callbackUrl}"
+    // 4. Backend consulta el estado UNA SOLA VEZ
+    // 5. Backend redirige a: /payment-success con los datos
+    // 6. ✅ Todo funciona sin errores
+    
+    log("Widget configurado sin event listeners adicionales", "ok");
+    log("El widget manejará la redirección automáticamente", "ok");
 
     window.wpwlOptions = {
       style: "card",
@@ -1115,16 +1131,6 @@ const genId = () => {
         cvv: "Código de verificación",
         cardHolder: "Nombre (Igual que en la tarjeta)",
         registerCard: "Guardar información de tarjeta para pagos futuros",
-      },
-      onPaymentStatus: function(data) {
-        // ✅ SOLUCIÓN: Interceptar cuando el pago se complete
-        // y redirigir UNA SOLA VEZ manualmente
-        if (data && data.id) {
-          log("Pago completado - redirigiendo al backend...", "ok");
-          // Redirigir directamente al callback con resourcePath
-          window.location.href = `${callbackUrl}&resourcePath=/v1/checkouts/${data.id}/payment`;
-          return false; // Prevenir redirección automática del widget
-        }
       },
       onReady: function () {
         const form = document.querySelector(
