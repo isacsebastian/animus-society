@@ -55,27 +55,61 @@ export const POST: APIRoute = async ({ request, url, redirect }) => {
 
 export const GET: APIRoute = async ({ url, redirect }) => {
   try {
-    // ✅ SOLUCIÓN DIRECTA: Siempre redirigir a payment-processing
-    // El backend procesará en segundo plano vía webhook
-    console.log('[json-response proxy] GET request recibido, redirigiendo a /payment-processing');
-    console.log('[json-response proxy] Query string:', url.search);
-    
-    // Extraer parámetros para pasarlos al backend en segundo plano si es necesario
     const queryString = url.search;
     const endpoint = `${BACKEND_URL}/api/payments/json-response${queryString}`;
-    
-    // Llamar al backend en segundo plano (sin esperar respuesta)
-    fetch(endpoint, {
-      method: 'GET',
-      redirect: 'manual',
-    }).catch(err => {
-      console.error('[json-response proxy] Error en background fetch:', err);
-    });
-    
-    // Redirigir inmediatamente sin esperar
-    return redirect('/payment-processing', 302);
+
+    console.log('[json-response proxy] Forwarding GET to:', endpoint);
+
+    // Crear un AbortController para timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25 segundos timeout
+
+    try {
+      const response = await fetch(endpoint, {
+        method: 'GET',
+        redirect: 'manual',
+        signal: controller.signal,
+      });
+      
+      clearTimeout(timeoutId);
+
+      console.log('[json-response proxy] Backend response status:', response.status);
+
+      // ✅ SOLUCIÓN: SIEMPRE redirigir a /payment-processing
+      if (response.status >= 300 && response.status < 400) {
+        const location = response.headers.get('Location');
+        console.log('[json-response proxy] Backend quería redirigir a:', location);
+        console.log('[json-response proxy] Redirigiendo a /payment-processing en su lugar');
+        
+        // SIEMPRE redirigir a payment-processing
+        return redirect('/payment-processing', 302);
+      }
+
+      const data = await response.text();
+
+      return new Response(data, {
+        status: response.status,
+        headers: {
+          'Content-Type': response.headers.get('Content-Type') || 'application/json',
+        },
+      });
+    } catch (fetchError) {
+      clearTimeout(timeoutId);
+      
+      // Si es abort/timeout, redirigir a payment-processing
+      if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+        console.error('[json-response proxy] Timeout en GET request');
+        console.log('[json-response proxy] Redirigiendo a /payment-processing por timeout');
+        return redirect('/payment-processing', 302);
+      }
+      
+      throw fetchError; // Re-lanzar otros errores
+    }
   } catch (error) {
     console.error('[json-response proxy] Error general:', error);
+    
+    // ✅ En caso de error, redirigir a payment-processing
+    console.log('[json-response proxy] Error general - redirigiendo a /payment-processing');
     return redirect('/payment-processing', 302);
   }
 };
