@@ -1100,16 +1100,17 @@ const genId = () => {
     if (prevScript) prevScript.remove();
     
     // ✅ FLUJO CORRECTO:
-    // 1. Widget intercepta con onBeforeRedirect
-    // 2. Llama backend en segundo plano para guardar pago
-    // 3. Redirige INMEDIATAMENTE a /payment-processing
-    // 4. Usuario ve página bonita sin errores 502
+    // 1. Widget → Backend (callbackUrl) con resourcePath
+    // 2. Backend procesa y redirecciona SIEMPRE a /payment-processing
+    // 3. Usuario ve página bonita de "procesando"
+    // 4. Backend envía email con resultado final
     mount.innerHTML = `
-      <form class="paymentWidgets"
-            data-brands="VISA MASTER AMEX DINERS DISCOVER">
+      <form action="${callbackUrl}" class="paymentWidgets"
+            data-brands="VISA MASTER AMEX DINERS DISCOVER"
+            data-shopper-result-url="${callbackUrl}">
       </form>`;
 
-    log("Widget configurado - redirigirá a /payment-processing", "ok");
+    log("Widget configurado - backend procesará en segundo plano", "ok");
 
     // ✅ SOLUCIÓN FINAL: NO esperar respuesta del backend, redirigir directo
     window.wpwlOptions = {

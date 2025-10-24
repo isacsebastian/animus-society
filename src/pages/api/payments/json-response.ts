@@ -7,52 +7,75 @@ export const POST: APIRoute = async ({ request, url, redirect }) => {
     const queryString = url.search;
     const endpoint = `${BACKEND_URL}/api/payments/json-response${queryString}`;
 
-    console.log('[json-response proxy POST] Forwarding to backend:', endpoint);
+    console.log('[json-response proxy] Forwarding POST to:', endpoint);
 
     // Obtener el body de la petición
     const body = await request.text();
 
-    // ✅ Llamar al backend en segundo plano (sin esperar respuesta)
-    fetch(endpoint, {
+    // Reenviar la petición al backend
+    const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': request.headers.get('Content-Type') || 'application/x-www-form-urlencoded',
       },
       body: body,
-    }).catch(err => {
-      console.error('[json-response proxy POST] Error en background fetch (ignorado):', err);
+      redirect: 'manual', // No seguir redirects automáticamente
     });
 
-    // ✅ Redirigir INMEDIATAMENTE a /payment-processing
-    console.log('[json-response proxy POST] Redirigiendo inmediatamente a /payment-processing');
-    return redirect('/payment-processing', 302);
+    console.log('[json-response proxy] Backend response status:', response.status);
+
+    // ✅ SOLUCIÓN: SIEMPRE redirigir a /payment-processing
+    // Sin importar si el backend dice /payment-success o cualquier otra cosa
+    if (response.status >= 300 && response.status < 400) {
+      const location = response.headers.get('Location');
+      console.log('[json-response proxy] Backend quería redirigir a:', location);
+      console.log('[json-response proxy] Redirigiendo a /payment-processing en su lugar');
+      
+      // SIEMPRE redirigir a payment-processing
+      return redirect('/payment-processing', 302);
+    }
+
+    // Si no es redirect, devolver la respuesta tal cual
+    const data = await response.text();
+
+    return new Response(data, {
+      status: response.status,
+      headers: {
+        'Content-Type': response.headers.get('Content-Type') || 'application/json',
+      },
+    });
   } catch (error) {
-    console.error('[json-response proxy POST] Error:', error);
+    console.error('[json-response proxy] Error:', error);
     
     // ✅ En caso de error, también redirigir a payment-processing
+    console.log('[json-response proxy] Error capturado - redirigiendo a /payment-processing');
     return redirect('/payment-processing', 302);
   }
 };
 
 export const GET: APIRoute = async ({ url, redirect }) => {
   try {
+    // ✅ SOLUCIÓN DIRECTA: Siempre redirigir a payment-processing
+    // El backend procesará en segundo plano vía webhook
+    console.log('[json-response proxy] GET request recibido, redirigiendo a /payment-processing');
+    console.log('[json-response proxy] Query string:', url.search);
+    
+    // Extraer parámetros para pasarlos al backend en segundo plano si es necesario
     const queryString = url.search;
     const endpoint = `${BACKEND_URL}/api/payments/json-response${queryString}`;
     
-    console.log('[json-response proxy GET] Forwarding to backend:', endpoint);
-    
-    // ✅ Llamar al backend en segundo plano (sin esperar respuesta)
+    // Llamar al backend en segundo plano (sin esperar respuesta)
     fetch(endpoint, {
       method: 'GET',
+      redirect: 'manual',
     }).catch(err => {
-      console.error('[json-response proxy GET] Error en background fetch (ignorado):', err);
+      console.error('[json-response proxy] Error en background fetch:', err);
     });
     
-    // ✅ Redirigir INMEDIATAMENTE a /payment-processing
-    console.log('[json-response proxy GET] Redirigiendo inmediatamente a /payment-processing');
+    // Redirigir inmediatamente sin esperar
     return redirect('/payment-processing', 302);
   } catch (error) {
-    console.error('[json-response proxy GET] Error:', error);
+    console.error('[json-response proxy] Error general:', error);
     return redirect('/payment-processing', 302);
   }
 };
