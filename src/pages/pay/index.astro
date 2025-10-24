@@ -1112,7 +1112,7 @@ const genId = () => {
 
     log("Widget configurado - backend redirigirá a /payment-processing", "ok");
 
-    // ✅ SOLUCIÓN: Interceptar la redirección del widget y hacer POST manual
+    // ✅ SOLUCIÓN DEFINITIVA: NO interceptar nada, dejar que el widget funcione solo
     window.wpwlOptions = {
       style: "card",
       locale: "es",
@@ -1120,25 +1120,6 @@ const genId = () => {
         cvv: "Código de verificación",
         cardHolder: "Nombre (Igual que en la tarjeta)",
         registerCard: "Guardar información de tarjeta para pagos futuros",
-      },
-      onBeforeRedirect: function(data) {
-        // El widget quiere redirigir, pero nosotros lo hacemos manualmente
-        log("Pago completado - procesando redirección manual...", "ok");
-        
-        // Construir la URL del callback con los parámetros
-        const url = new URL(callbackUrl);
-        if (data && data.id) {
-          url.searchParams.set('id', data.id);
-          url.searchParams.set('resourcePath', `/v1/checkouts/${data.id}/payment`);
-        }
-        
-        log(`Redirigiendo a: ${url.toString()}`, "ok");
-        
-        // Redirigir directamente (el proxy interceptará y enviará a /payment-processing)
-        window.location.href = url.toString();
-        
-        // Prevenir la redirección automática del widget
-        return false;
       },
       onReady: function () {
         const form = document.querySelector(
